@@ -1,5 +1,4 @@
 import processing.core.PApplet;
-
 import oscP5.*;
 import netP5.*;
 
@@ -12,21 +11,25 @@ public class MatrixClassProject extends PApplet{
 	Launchpad NewLaunchpad;
 	int tempVelocity = 0;
 	int tempNote = 0;
+	Stripe[] stripes = new Stripe[50];
+	ConfigTable configTable;
+	
+	
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		PApplet.main("MatrixClassProject");
 	}
 	
-	//	An array of stripes
-	Stripe[] stripes = new Stripe[50];
-
-	public void settings() {
+	public void settings() 
+	{
 		size(200,200);
 		fullScreen(1);
+		configTable = new ConfigTable();
+		configTable.initialize("JSON_File");
 	}
 
-	public void setup() {
+	public void setup() 
+	{
 		background(50);
 		surface.setResizable(true);
 		
@@ -38,27 +41,45 @@ public class MatrixClassProject extends PApplet{
 		NewLaunchpad = new Launchpad(this);
 	}
 
-	public void draw() {
+	public void draw() 
+	{
 		background(0);
 		smooth();
 		noStroke();
 		NewLaunchpad.display();
 	}
 	
-	void oscEvent(OscMessage theOscMessage) {
+	void oscEvent(OscMessage theOscMessage) 
+	{
 		  
 		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
-
-	  if(temp_Addr.equals("/PitchAndVelocity"))
-	  {
-	    tempNote = theOscMessage.get(0).intValue();
-	    tempVelocity = theOscMessage.get(1).intValue(); 
-	    
-	    if(tempNote >=36 && tempNote <= 99)
-	      NewLaunchpad.update(tempNote,tempVelocity);
-	    //else
-	    //  println("Note:"+tempNote+",Volicity:"+tempVelocity);
-	  }
+		
+		if(temp_Addr.equals("/PitchAndVelocity"))
+		{
+			tempNote = theOscMessage.get(0).intValue();
+			tempVelocity = theOscMessage.get(1).intValue(); 
+			    
+			if(tempNote >=36 && tempNote <= 99)
+				NewLaunchpad.update(tempNote,tempVelocity);
+			else
+			{
+				for (int i = 0; i < configTable.SettingList.size(); i ++)
+				{
+					SettingRule setting = configTable.SettingList.get(i);
+					if(tempNote == setting.Note)
+					{
+						OscMessage myMessage = new OscMessage("/TagAndVelocity");
+						myMessage.add(setting.Tag);
+						myMessage.add(tempVelocity);
+						oscP5.send(myMessage, setting.NetSettings); 
+					}
+	
+				}
+			}
+			
+			//else
+			//  println("Note:"+tempNote+",Volicity:"+tempVelocity);
+		}
 
 
 	  /*
@@ -78,6 +99,7 @@ public class MatrixClassProject extends PApplet{
 
 	    // TOP LIGHT 28~35
 		} 
+		//abc
 	  */
 
 	}
