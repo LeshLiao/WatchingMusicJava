@@ -2,11 +2,9 @@
 import netP5.NetAddress;
 
 public class SettingRule {
-
 	boolean Enable;
 	int Note;
 	int condition;
-	//ArrayList<NetAddress> NetSettings;
 	NetAddress NetSettings;	
 	int Tag;
 	

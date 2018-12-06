@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+
+import oscP5.OscMessage;
 import processing.core.PApplet;
 
 //import processing.core.*;
@@ -13,12 +15,23 @@ public class Launchpad
 	final static int SlotGapX = 145;
 	final static int SlotGapY = 40;
 	PApplet parent; // The parent PApplet that we will render ourselves onto
+	OscMessage myMatrixMessage; 
+	
+	ConfigTable MyTestconfigTable;
+	Long CompareCheckSum = 0L;
+	String LastOneStr = "";
+	Boolean IsSendData;
 	
 	Launchpad(PApplet p)
 	{
 		parent = p;
 		InitPosition();
 		MyColor = new ColorMappingTable(); 
+		myMatrixMessage = new OscMessage("/MatrixVelocity");
+		
+		//Test
+		MyTestconfigTable = new ConfigTable();
+		MyTestconfigTable.initialize("JSON_File");
 	}
 
 	public void InitPosition()
@@ -70,5 +83,49 @@ public class Launchpad
 			Particle P1 = MainMatrix.get(i);
 			P1.display();
 		}
+	}
+	
+	public void PackMyOSCMessage()
+	{
+		myMatrixMessage.clearArguments();
+		String tempStr = "";
+		
+		/*
+		for (int i = 0; i < MainMatrix.size(); i ++)
+		{
+			Particle P1 = MainMatrix.get(i);
+			myMatrixMessage.add(P1.MyVolicity);
+		}
+		*/
+		
+		/*
+		for (int i = 0; i < MainMatrix.size(); i ++)
+		{
+			Particle P1 = MainMatrix.get(i);
+			tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
+		}
+		*/
+		
+		for (int i = 0; i < MyTestconfigTable.Matrix_SettingList.size(); i ++)
+		{
+			SettingRule setting = MyTestconfigTable.Matrix_SettingList.get(i);
+			
+			Particle P1 = MainMatrix.get(setting.Note-36);
+			tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
+			//CompareCheckSum = CompareCheckSum + (setting.Note * i * P1.MyVolicity);
+		}
+		
+		if(LastOneStr.equals(tempStr))
+		{
+			IsSendData = false;
+		}
+		else
+		{
+			IsSendData = true;
+		}
+		
+				
+		LastOneStr = tempStr;
+		myMatrixMessage.add(tempStr);
 	}
 }

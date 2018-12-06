@@ -8,6 +8,8 @@ public class MatrixClassProject extends PApplet{
 	OscP5 oscP5;
 	NetAddress myRemoteLocation;
 	NetAddress AbletonliveLocation;
+	NetAddress TestLocation;
+	
 	Launchpad NewLaunchpad;
 	int tempVelocity = 0;
 	int tempNote = 0;
@@ -23,7 +25,7 @@ public class MatrixClassProject extends PApplet{
 	public void settings() 
 	{
 		size(200,200);
-		fullScreen(1);
+		//fullScreen(1);
 		configTable = new ConfigTable();
 		configTable.initialize("JSON_File");
 	}
@@ -33,10 +35,12 @@ public class MatrixClassProject extends PApplet{
 		background(50);
 		surface.setResizable(true);
 		
-		frameRate(50);
+		frameRate(60);
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
 		AbletonliveLocation = new NetAddress("127.0.0.1",8000);
+		
+		TestLocation = new NetAddress("10.1.1.2",7700);
 		noStroke(); // no border line
 		NewLaunchpad = new Launchpad(this);
 	}
@@ -47,6 +51,12 @@ public class MatrixClassProject extends PApplet{
 		smooth();
 		noStroke();
 		NewLaunchpad.display();
+		
+		NewLaunchpad.PackMyOSCMessage();
+		if(NewLaunchpad.IsSendData == true) 
+		{
+			oscP5.send(NewLaunchpad.myMatrixMessage, myRemoteLocation);
+		}
 	}
 	
 	void oscEvent(OscMessage theOscMessage) 
@@ -59,16 +69,21 @@ public class MatrixClassProject extends PApplet{
 			tempNote = theOscMessage.get(0).intValue();
 			tempVelocity = theOscMessage.get(1).intValue(); 
 			    
-			if(tempNote >=36 && tempNote <= 99)
+			//if(tempNote >=36 && tempNote <= 99)
+			//	NewLaunchpad.update(tempNote,tempVelocity);
+			
+			
+			if(tempNote >=36 && tempNote <= 99)					// Matrix 8X8
 				NewLaunchpad.update(tempNote,tempVelocity);
-			else
+			else												// Frame 8X4
 			{
-				for (int i = 0; i < configTable.SettingList.size(); i ++)
+				OscMessage myMessage = new OscMessage("/TagAndVelocity");
+				for (int i = 0; i < configTable.Top_SettingList.size(); i ++)
 				{
-					SettingRule setting = configTable.SettingList.get(i);
+					SettingRule setting = configTable.Top_SettingList.get(i);
 					if(tempNote == setting.Note)
 					{
-						OscMessage myMessage = new OscMessage("/TagAndVelocity");
+						myMessage.clearArguments();
 						myMessage.add(setting.Tag);
 						myMessage.add(tempVelocity);
 						oscP5.send(myMessage, setting.NetSettings); 
@@ -76,6 +91,7 @@ public class MatrixClassProject extends PApplet{
 	
 				}
 			}
+			
 			
 			//else
 			//  println("Note:"+tempNote+",Volicity:"+tempVelocity);
@@ -105,14 +121,43 @@ public class MatrixClassProject extends PApplet{
 	}
 	public void mousePressed() 
 	{
-		OscMessage myMessage = new OscMessage("/Velocity1");
+//		OscMessage myMessage = new OscMessage("/Velocity1");
+//		int ValueRan = (int) (random(100));
+//		myMessage.add(ValueRan); /* add an int to the osc message */
+//		oscP5.send(myMessage, myRemoteLocation); 
+//
+//		OscMessage myMessage2 = new OscMessage("/Note1");
+//		myMessage2.add(36); /* add an int to the osc message */
+//		oscP5.send(myMessage2, myRemoteLocation); 
+		
+		
+		OscMessage myMessage = new OscMessage("/TagAndVelocity");
+		//int ValueRan = (int) (random(100));
+		//float TestValue = 0.005f;
+		myMessage.add(255); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		myMessage.add(255); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		myMessage.add(0); 
+		
+		oscP5.send(myMessage, TestLocation); 
+		
+		
+		/*
+		// Bundle Test
+		OscBundle TestBundle = new OscBundle();
+		OscMessage myMessage = new OscMessage("/TagAndVelocity");
 		int ValueRan = (int) (random(100));
-		myMessage.add(ValueRan); /* add an int to the osc message */
-		oscP5.send(myMessage, myRemoteLocation); 
-
-		OscMessage myMessage2 = new OscMessage("/Note1");
-		myMessage2.add(36); /* add an int to the osc message */
-		oscP5.send(myMessage2, myRemoteLocation); 
+		myMessage.add(111); 
+		myMessage.add(222);
+		TestBundle.add(myMessage);
+		oscP5.send(TestBundle, TestLocation); 
+		*/
 	}
 
 	public void keyPressed() 

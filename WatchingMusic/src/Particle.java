@@ -9,6 +9,8 @@ public class Particle {
 	private int SlotSize;
 	private int shape;
 	PApplet parent; 
+	int MyVolicity;
+	
 	int colorTable[][] = {{0, 0, 0},
 			 {33, 33, 33},
 			 {139, 139, 139},
@@ -144,13 +146,15 @@ public class Particle {
 		pos = new PVector(_x,_y);
 		SlotSize = _size; 
 		shape = 0;
+		MyVolicity = 0;
 	}
 
 	public void SetColor(int Volicity)
 	{
 		colorR = colorTable[Volicity][0];
 		colorG = colorTable[Volicity][1];	
-		colorB = colorTable[Volicity][2];		
+		colorB = colorTable[Volicity][2];	
+		MyVolicity = Volicity;
 		//ParticleColor = _ParticleColor; 
 	}
 	
