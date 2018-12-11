@@ -140,6 +140,15 @@ public class Particle {
 			 {194, 112, 2},
 			 {89, 28, 3}};
 	
+	Particle(PApplet p)
+	{
+		parent = p;
+		pos = new PVector(0,0);
+		SlotSize = 0; 
+		shape = 0;
+		MyVolicity = 0;
+	}
+	
 	Particle(PApplet p,int _x,int _y,int _size)
 	{
 		parent = p;
@@ -156,6 +165,13 @@ public class Particle {
 		colorB = colorTable[Volicity][2];	
 		MyVolicity = Volicity;
 		//ParticleColor = _ParticleColor; 
+	}
+
+	public void SetPosition(int _x,int _y,int _size)
+	{
+		pos.x = _x;
+		pos.y = _y;
+		SlotSize = _size;
 	}
 	
 	public void SetShape(int _shape)

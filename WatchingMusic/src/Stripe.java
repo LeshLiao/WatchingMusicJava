@@ -16,7 +16,7 @@ public class Stripe {
     mouse = false;
   }
 
-  // Draw stripe
+  // Draw stripe 
   void display() {
     parent.fill(255,100);
     parent.noStroke();

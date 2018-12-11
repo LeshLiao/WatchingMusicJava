@@ -14,7 +14,7 @@ public class MatrixClassProject extends PApplet{
 	int tempVelocity = 0;
 	int tempNote = 0;
 	Stripe[] stripes = new Stripe[50];
-	ConfigTable configTable;
+	//ConfigTable configTable;
 	
 	
 	
@@ -26,8 +26,6 @@ public class MatrixClassProject extends PApplet{
 	{
 		size(200,200);
 		//fullScreen(1);
-		configTable = new ConfigTable();
-		configTable.initialize("JSON_File");
 	}
 
 	public void setup() 
@@ -35,7 +33,7 @@ public class MatrixClassProject extends PApplet{
 		background(50);
 		surface.setResizable(true);
 		
-		frameRate(60);
+		frameRate(60);	// 60Hz
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
 		AbletonliveLocation = new NetAddress("127.0.0.1",8000);
@@ -61,9 +59,7 @@ public class MatrixClassProject extends PApplet{
 	
 	void oscEvent(OscMessage theOscMessage) 
 	{
-		  
 		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
-		
 		if(temp_Addr.equals("/PitchAndVelocity"))
 		{
 			tempNote = theOscMessage.get(0).intValue();
@@ -78,9 +74,9 @@ public class MatrixClassProject extends PApplet{
 			else												// Frame 8X4
 			{
 				OscMessage myMessage = new OscMessage("/TagAndVelocity");
-				for (int i = 0; i < configTable.Top_SettingList.size(); i ++)
+				for (int i = 0; i < NewLaunchpad.MyTestconfigTable.Top_SettingList.size(); i ++)
 				{
-					SettingRule setting = configTable.Top_SettingList.get(i);
+					SettingRule setting = NewLaunchpad.MyTestconfigTable.Top_SettingList.get(i);
 					if(tempNote == setting.Note)
 					{
 						myMessage.clearArguments();
@@ -88,7 +84,6 @@ public class MatrixClassProject extends PApplet{
 						myMessage.add(tempVelocity);
 						oscP5.send(myMessage, setting.NetSettings); 
 					}
-	
 				}
 			}
 			
@@ -96,28 +91,6 @@ public class MatrixClassProject extends PApplet{
 			//else
 			//  println("Note:"+tempNote+",Volicity:"+tempVelocity);
 		}
-
-
-	  /*
-		if(temp_Addr.equals("/Velo"))
-		{
-			tempVelocity = theOscMessage.get(0).intValue();     
-		}
-		else if(temp_Addr.equals("/Note"))
-		{
-			tempNote = theOscMessage.get(0).intValue();  
-			
-			if(tempNote >=36 && tempNote <= 99)
-				NewLaunchpad.update(tempNote,tempVelocity);
-			else
-				println("Note:"+tempNote+",Volicity:"+tempVelocity);
-
-
-	    // TOP LIGHT 28~35
-		} 
-		//abc
-	  */
-
 	}
 	public void mousePressed() 
 	{

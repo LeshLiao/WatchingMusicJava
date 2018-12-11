@@ -8,6 +8,195 @@
 	<description>Planet Eclipse - http://planeteclipse.org/planet/</description>
 
 <item>
+	<title>vert.x project: HTTP response validation with the Vert.x Web Client</title>
+	<guid isPermaLink="true">https://vertx.io/blog/http-response-validation-with-the-vert-x-web-client</guid>
+	<link>https://vertx.io/blog/http-response-validation-with-the-vert-x-web-client</link>
+	<description>&lt;article&gt;&lt;p&gt;By default, a &lt;a href=&quot;http://vertx.io/docs/vertx-web-client/java/&quot;&gt;Vert.x Web Client&lt;/a&gt; request ends with an error only if something wrong happens at the network level.
+In other words, a &lt;code&gt;404 Not Found&lt;/code&gt; response, or a response with the wrong content type, are &lt;strong&gt;not&lt;/strong&gt; considered as failures.&lt;/p&gt;
+&lt;p&gt;Hence, you would usually perform sanity checks manually after the response is received:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;client
+  .get(&lt;span class=&quot;hljs-number&quot;&gt;8080&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;myserver.mycompany.com&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;/some-uri&quot;&lt;/span&gt;)
+  .send(ar -&amp;gt; {
+    &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (ar.succeeded()) {
+      &lt;span class=&quot;hljs-type&quot;&gt;HttpResponse&lt;/span&gt;&amp;lt;&lt;span class=&quot;hljs-type&quot;&gt;Buffer&lt;/span&gt;&amp;gt; response = ar.&lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt;();
+      &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (response.statusCode() == &lt;span class=&quot;hljs-number&quot;&gt;200&lt;/span&gt; &amp;amp;&amp;amp; response.getHeader(&lt;span class=&quot;hljs-string&quot;&gt;&quot;content-type&quot;&lt;/span&gt;).equals(&lt;span class=&quot;hljs-string&quot;&gt;&quot;application/json&quot;&lt;/span&gt;)) {
+        // &lt;span class=&quot;hljs-type&quot;&gt;Decode&lt;/span&gt; the body &lt;span class=&quot;hljs-keyword&quot;&gt;as&lt;/span&gt; a json &lt;span class=&quot;hljs-keyword&quot;&gt;object&lt;/span&gt;
+        &lt;span class=&quot;hljs-type&quot;&gt;JsonObject&lt;/span&gt; body = response.bodyAsJsonObject();
+      } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+        &lt;span class=&quot;hljs-type&quot;&gt;System&lt;/span&gt;.&lt;span class=&quot;hljs-keyword&quot;&gt;out&lt;/span&gt;.println(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Something went wrong &quot;&lt;/span&gt; + response.statusCode());
+      }
+    } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+      &lt;span class=&quot;hljs-type&quot;&gt;System&lt;/span&gt;.&lt;span class=&quot;hljs-keyword&quot;&gt;out&lt;/span&gt;.println(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Something went wrong &quot;&lt;/span&gt; + ar.cause().getMessage());
+    }
+  });&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Starting with &lt;a href=&quot;http://vertx.io/blog/eclipse-vert-x-3-6-0-released/&quot;&gt;Vert.x 3.6&lt;/a&gt;, you can can trade flexibility for clarity and conciseness using &lt;em&gt;response predicates&lt;/em&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;response-predicates&quot;&gt;Response predicates&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://vertx.io/docs/apidocs/io/vertx/ext/web/client/predicate/ResponsePredicate.html&quot;&gt;Response predicates&lt;/a&gt; can fail a request when the response does not match criterion.&lt;/p&gt;
+&lt;p&gt;The Web Client module comes with a set of ready-to-use predicates:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;client
+  .get(&lt;span class=&quot;hljs-number&quot;&gt;8080&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;myserver.mycompany.com&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;/some-uri&quot;&lt;/span&gt;)
+  .expect(&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.&lt;span class=&quot;hljs-type&quot;&gt;SC_SUCCESS&lt;/span&gt;)
+  .expect(&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.&lt;span class=&quot;hljs-type&quot;&gt;JSON&lt;/span&gt;)
+  .send(ar -&amp;gt; {
+    &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (ar.succeeded()) {
+      &lt;span class=&quot;hljs-type&quot;&gt;HttpResponse&lt;/span&gt;&amp;lt;&lt;span class=&quot;hljs-type&quot;&gt;Buffer&lt;/span&gt;&amp;gt; response = ar.&lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt;();
+      // &lt;span class=&quot;hljs-type&quot;&gt;Safely&lt;/span&gt; decode the body &lt;span class=&quot;hljs-keyword&quot;&gt;as&lt;/span&gt; a json &lt;span class=&quot;hljs-keyword&quot;&gt;object&lt;/span&gt;
+      &lt;span class=&quot;hljs-type&quot;&gt;JsonObject&lt;/span&gt; body = response.bodyAsJsonObject();
+    } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+      &lt;span class=&quot;hljs-type&quot;&gt;System&lt;/span&gt;.&lt;span class=&quot;hljs-keyword&quot;&gt;out&lt;/span&gt;.println(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Something went wrong &quot;&lt;/span&gt; + ar.cause().getMessage());
+    }
+  });&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The web is full of HTTP/JSON endpoints, so there is no doubt the &lt;code&gt;ResponsePredicate.SC_SUCCESS&lt;/code&gt; and &lt;code&gt;ResponsePredicate.JSON&lt;/code&gt; can be handy.&lt;/p&gt;
+&lt;p&gt;Nevertheless, you might also need to check that the status code is whithin a specific range:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;client
+  .&lt;span class=&quot;hljs-keyword&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;8080&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;myserver.mycompany.com&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;/some-uri&quot;&lt;/span&gt;)
+  .expect(ResponsePredicate.status(&lt;span class=&quot;hljs-number&quot;&gt;200&lt;/span&gt;, &lt;span class=&quot;hljs-number&quot;&gt;202&lt;/span&gt;))
+  .send(ar -&amp;gt; {
+    &lt;span class=&quot;hljs-comment&quot;&gt;// ....&lt;/span&gt;
+  });&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Or that the content is of a specific type: &lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;client
+  .&lt;span class=&quot;hljs-keyword&quot;&gt;get&lt;/span&gt;(&lt;span class=&quot;hljs-number&quot;&gt;8080&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;myserver.mycompany.com&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;/some-uri&quot;&lt;/span&gt;)
+  .expect(ResponsePredicate.contentType(&lt;span class=&quot;hljs-string&quot;&gt;&quot;some/content-type&quot;&lt;/span&gt;))
+  .send(ar -&amp;gt; {
+    &lt;span class=&quot;hljs-comment&quot;&gt;// ....&lt;/span&gt;
+  });&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Please refer to the &lt;a href=&quot;http://vertx.io/docs/apidocs/io/vertx/ext/web/client/predicate/ResponsePredicate.html&quot;&gt;&lt;code&gt;ResponsePredicate&lt;/code&gt; documentation&lt;/a&gt; for a full list of predefined predicates.&lt;/p&gt;
+&lt;h3 id=&quot;custom-predicates&quot;&gt;Custom predicates&lt;/h3&gt;
+&lt;p&gt;Eventually, predicates were not designed for status code and content type checking only, so feel free to create your own validation code:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;&lt;span class=&quot;hljs-comment&quot;&gt;// Check CORS header allowing to do POST&lt;/span&gt;
+Function&lt;span class=&quot;hljs-subst&quot;&gt;&amp;lt;&lt;/span&gt;HttpResponse&lt;span class=&quot;hljs-subst&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;hljs-literal&quot;&gt;Void&lt;/span&gt;&lt;span class=&quot;hljs-subst&quot;&gt;&amp;gt;&lt;/span&gt;, ResponsePredicateResult&lt;span class=&quot;hljs-subst&quot;&gt;&amp;gt;&lt;/span&gt; methodsPredicate &lt;span class=&quot;hljs-subst&quot;&gt;=&lt;/span&gt; resp &lt;span class=&quot;hljs-subst&quot;&gt;-&amp;gt; &lt;/span&gt;{
+  &lt;span class=&quot;hljs-built_in&quot;&gt;String&lt;/span&gt; methods &lt;span class=&quot;hljs-subst&quot;&gt;=&lt;/span&gt; resp&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;getHeader(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Access-Control-Allow-Methods&quot;&lt;/span&gt;);
+  &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (methods &lt;span class=&quot;hljs-subst&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;hljs-built_in&quot;&gt;null&lt;/span&gt;) {
+    &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (methods&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;contains(&lt;span class=&quot;hljs-string&quot;&gt;&quot;POST&quot;&lt;/span&gt;)) {
+      &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; ResponsePredicateResult&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;success();
+    }
+  }
+  &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; ResponsePredicateResult&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;failure(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Does not work&quot;&lt;/span&gt;);
+};
+
+&lt;span class=&quot;hljs-comment&quot;&gt;// Send pre-flight CORS request&lt;/span&gt;
+client
+  &lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;request(HttpMethod&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;OPTIONS, &lt;span class=&quot;hljs-number&quot;&gt;8080&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;myserver.mycompany.com&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;/some-uri&quot;&lt;/span&gt;)
+  &lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;putHeader(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Origin&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;Server-b.com&quot;&lt;/span&gt;)
+  &lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;putHeader(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Access-Control-Request-Method&quot;&lt;/span&gt;, &lt;span class=&quot;hljs-string&quot;&gt;&quot;POST&quot;&lt;/span&gt;)
+  &lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;expect(methodsPredicate)
+  &lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;send(ar &lt;span class=&quot;hljs-subst&quot;&gt;-&amp;gt; &lt;/span&gt;{
+    &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (ar&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;succeeded()) {
+      &lt;span class=&quot;hljs-comment&quot;&gt;// Process the POST request now&lt;/span&gt;
+    } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+      System&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;out&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;println(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Something went wrong &quot;&lt;/span&gt; &lt;span class=&quot;hljs-subst&quot;&gt;+&lt;/span&gt; ar&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;cause()&lt;span class=&quot;hljs-built_in&quot;&gt;.&lt;/span&gt;getMessage());
+    }
+  });&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that response predicates are evaluated &lt;em&gt;before&lt;/em&gt; the response body is received.
+Therefore &lt;strong&gt;you can’t inspect the response body&lt;/strong&gt; in a predicate test function, only status code, status message and response headers.&lt;/p&gt;
+&lt;h2 id=&quot;dealing-with-failures&quot;&gt;Dealing with failures&lt;/h2&gt;
+&lt;p&gt;By default, response predicates (including the predefined ones) use a generic error converter which discards the response body and conveys a simple message.
+You can customize the exception class by changing the error converter:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt; predicate = &lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.create(&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.&lt;span class=&quot;hljs-type&quot;&gt;SC_SUCCESS&lt;/span&gt;, &lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt; -&amp;gt; {
+  &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; new &lt;span class=&quot;hljs-type&quot;&gt;MyCustomException&lt;/span&gt;(&lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt;.message());
+});&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Beware that creating exceptions in Java comes with the &lt;strong&gt;performance cost&lt;/strong&gt; of capturing the call stack.
+The generic error converter generates exceptions that do not capture it.&lt;/p&gt;
+&lt;h3 id=&quot;reading-details-in-error-responses&quot;&gt;Reading details in error responses&lt;/h3&gt;
+&lt;p&gt;Many web APIs provide details in error responses.
+For example, the &lt;a href=&quot;https://developer.marvel.com/docs&quot;&gt;Marvel API&lt;/a&gt; uses this JSON object format:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;{
+  &quot;&lt;span class=&quot;hljs-attribute&quot;&gt;code&lt;/span&gt;&quot;: &lt;span class=&quot;hljs-value&quot;&gt;&lt;span class=&quot;hljs-string&quot;&gt;&quot;InvalidCredentials&quot;&lt;/span&gt;&lt;/span&gt;,
+  &quot;&lt;span class=&quot;hljs-attribute&quot;&gt;message&lt;/span&gt;&quot;: &lt;span class=&quot;hljs-value&quot;&gt;&lt;span class=&quot;hljs-string&quot;&gt;&quot;The passed API key is invalid.&quot;&lt;/span&gt;
+&lt;/span&gt;}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To avoid losing this information, it is possible to wait for the response body to be fully received before the error converter is called:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs&quot;&gt;&lt;span class=&quot;hljs-type&quot;&gt;ErrorConverter&lt;/span&gt; &lt;span class=&quot;hljs-keyword&quot;&gt;converter&lt;/span&gt; = &lt;span class=&quot;hljs-type&quot;&gt;ErrorConverter&lt;/span&gt;.createFullBody(&lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt; -&amp;gt; {
+
+  // &lt;span class=&quot;hljs-type&quot;&gt;Invoked&lt;/span&gt; after the response body &lt;span class=&quot;hljs-keyword&quot;&gt;is&lt;/span&gt; fully received
+  &lt;span class=&quot;hljs-type&quot;&gt;HttpResponse&lt;/span&gt;&amp;lt;&lt;span class=&quot;hljs-type&quot;&gt;Buffer&lt;/span&gt;&amp;gt; response = &lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt;.response();
+
+  &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (response.getHeader(&lt;span class=&quot;hljs-string&quot;&gt;&quot;content-type&quot;&lt;/span&gt;).equals(&lt;span class=&quot;hljs-string&quot;&gt;&quot;application/json&quot;&lt;/span&gt;)) {
+    // &lt;span class=&quot;hljs-type&quot;&gt;Error&lt;/span&gt; body &lt;span class=&quot;hljs-keyword&quot;&gt;is&lt;/span&gt; &lt;span class=&quot;hljs-type&quot;&gt;JSON&lt;/span&gt; data
+    &lt;span class=&quot;hljs-type&quot;&gt;JsonObject&lt;/span&gt; body = response.bodyAsJsonObject();
+    &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; new &lt;span class=&quot;hljs-type&quot;&gt;MyCustomException&lt;/span&gt;(body.getString(&lt;span class=&quot;hljs-string&quot;&gt;&quot;code&quot;&lt;/span&gt;), body.getString(&lt;span class=&quot;hljs-string&quot;&gt;&quot;message&quot;&lt;/span&gt;));
+  }
+
+  // &lt;span class=&quot;hljs-type&quot;&gt;Fallback&lt;/span&gt; to defaut message
+  &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; new &lt;span class=&quot;hljs-type&quot;&gt;MyCustomException&lt;/span&gt;(&lt;span class=&quot;hljs-literal&quot;&gt;result&lt;/span&gt;.message());
+});
+
+&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt; predicate = &lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.create(&lt;span class=&quot;hljs-type&quot;&gt;ResponsePredicate&lt;/span&gt;.&lt;span class=&quot;hljs-type&quot;&gt;SC_SUCCESS&lt;/span&gt;, &lt;span class=&quot;hljs-keyword&quot;&gt;converter&lt;/span&gt;);&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That’s it! Feel free to comment here or ask questions on our &lt;a href=&quot;http://vertx.io/community&quot;&gt;community channels&lt;/a&gt;.&lt;/p&gt;
+&lt;/article&gt;</description>
+	<pubDate>Mon, 10 Dec 2018 00:00:00 +0000</pubDate>
+</item>
+<item>
+	<title>vert.x project: The RSS reader tutorial. Step 3.</title>
+	<guid isPermaLink="true">https://vertx.io/blog/the-rss-reader-tutorial-step-3</guid>
+	<link>https://vertx.io/blog/the-rss-reader-tutorial-step-3</link>
+	<description>&lt;article&gt;&lt;h1 id=&quot;quick-recap&quot;&gt;Quick recap&lt;/h1&gt;
+&lt;p&gt;Now that &lt;a href=&quot;https://vertx.io/blog/eclipse-vert-x-3-6-0-released/&quot;&gt;Vert.x 3.6.0 has been released&lt;/a&gt;, it’s the perfect time to conclude our &lt;a href=&quot;https://vertx.io/docs/vertx-cassandra-client/java/&quot;&gt;Vert.x Cassandra Client&lt;/a&gt; tutorial!&lt;/p&gt;
+&lt;p&gt;In &lt;a href=&quot;https://vertx.io/blog/the-rss-reader-tutorial-step-2/&quot;&gt;the previous step&lt;/a&gt; we have successfully implemented the second endpoint 
+of the RSS reader app.&lt;/p&gt;
+&lt;p&gt;The RSS reader example assumes implementing 3 endpoints. This article is dedicated to implementing the last &lt;code&gt;GET /articles/by_rss_link?link={rss_link}&lt;/code&gt; endpoint.&lt;/p&gt;
+&lt;p&gt;Before completing this step, make sure your are in the &lt;code&gt;step_3&lt;/code&gt; git branch:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs bash&quot;&gt;git checkout step_3&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;implementing-the-3rd-endpoint&quot;&gt;Implementing the 3rd endpoint&lt;/h1&gt;
+&lt;p&gt;The 3rd endpoint serves a list of articles, related to a specific RSS channel. In a request, we specify RSS channel by providing a link. On the application side, after receiving a request we execute the following query:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&lt;span class=&quot;hljs-operator&quot;&gt;&lt;span class=&quot;hljs-keyword&quot;&gt;SELECT&lt;/span&gt; title, article_link, description, pubDate &lt;span class=&quot;hljs-keyword&quot;&gt;FROM&lt;/span&gt; articles_by_rss_link &lt;span class=&quot;hljs-keyword&quot;&gt;WHERE&lt;/span&gt; rss_link = RSS_LINK_FROM_REQUEST ;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;implementation&quot;&gt;Implementation&lt;/h1&gt;
+&lt;p&gt;For obtaining articles by RSS link we need to prepare a related statement first. Change &lt;code&gt;AppVerticle#prepareSelectArticlesByRssLink&lt;/code&gt; in this way:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs java&quot;&gt;&lt;span class=&quot;hljs-function&quot;&gt;&lt;span class=&quot;hljs-keyword&quot;&gt;private&lt;/span&gt; Future &lt;span class=&quot;hljs-title&quot;&gt;prepareSelectArticlesByRssLink&lt;/span&gt;&lt;span class=&quot;hljs-params&quot;&gt;()&lt;/span&gt; &lt;/span&gt;{
+    &lt;span class=&quot;hljs-keyword&quot;&gt;return&lt;/span&gt; Util.prepareQueryAndSetReference(client,
+            &lt;span class=&quot;hljs-string&quot;&gt;&quot;SELECT title, article_link, description, pubDate FROM articles_by_rss_link WHERE rss_link = ? ;&quot;&lt;/span&gt;,
+            selectArticlesByRssLink
+    );
+}&lt;/code&gt;&lt;/pre&gt; 
+
+&lt;p&gt;And now, we can implement the &lt;code&gt;AppVerticle#getArticles&lt;/code&gt; method. Basically, it will use the &lt;code&gt;selectArticlesByRssLink&lt;/code&gt; statement for finding articles by the given link. Here’s the implementation:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;hljs java&quot;&gt;&lt;span class=&quot;hljs-function&quot;&gt;&lt;span class=&quot;hljs-keyword&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;hljs-keyword&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;hljs-title&quot;&gt;getArticles&lt;/span&gt;&lt;span class=&quot;hljs-params&quot;&gt;(RoutingContext ctx)&lt;/span&gt; &lt;/span&gt;{
+    String link = ctx.request().getParam(&lt;span class=&quot;hljs-string&quot;&gt;&quot;link&quot;&lt;/span&gt;);
+    &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (link == &lt;span class=&quot;hljs-keyword&quot;&gt;null&lt;/span&gt;) {
+        responseWithInvalidRequest(ctx);
+    } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+        client.executeWithFullFetch(selectArticlesByRssLink.bind(link), handler -&amp;gt; {
+            &lt;span class=&quot;hljs-keyword&quot;&gt;if&lt;/span&gt; (handler.succeeded()) {
+                List rows = handler.result();
+
+                JsonObject responseJson = &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; JsonObject();
+                JsonArray articles = &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; JsonArray();
+
+                rows.forEach(eachRow -&amp;gt; articles.add(
+                        &lt;span class=&quot;hljs-keyword&quot;&gt;new&lt;/span&gt; JsonObject()
+                                .put(&lt;span class=&quot;hljs-string&quot;&gt;&quot;title&quot;&lt;/span&gt;, eachRow.getString(&lt;span class=&quot;hljs-number&quot;&gt;0&lt;/span&gt;))
+                                .put(&lt;span class=&quot;hljs-string&quot;&gt;&quot;link&quot;&lt;/span&gt;, eachRow.getString(&lt;span class=&quot;hljs-number&quot;&gt;1&lt;/span&gt;))
+                                .put(&lt;span class=&quot;hljs-string&quot;&gt;&quot;description&quot;&lt;/span&gt;, eachRow.getString(&lt;span class=&quot;hljs-number&quot;&gt;2&lt;/span&gt;))
+                                .put(&lt;span class=&quot;hljs-string&quot;&gt;&quot;pub_date&quot;&lt;/span&gt;, eachRow.getTimestamp(&lt;span class=&quot;hljs-number&quot;&gt;3&lt;/span&gt;).getTime())
+                ));
+
+                responseJson.put(&lt;span class=&quot;hljs-string&quot;&gt;&quot;articles&quot;&lt;/span&gt;, articles);
+                ctx.response().end(responseJson.toString());
+            } &lt;span class=&quot;hljs-keyword&quot;&gt;else&lt;/span&gt; {
+                log.error(&lt;span class=&quot;hljs-string&quot;&gt;&quot;failed to get articles for &quot;&lt;/span&gt; + link, handler.cause());
+                ctx.response().setStatusCode(&lt;span class=&quot;hljs-number&quot;&gt;500&lt;/span&gt;).end(&lt;span class=&quot;hljs-string&quot;&gt;&quot;Unable to retrieve the info from C*&quot;&lt;/span&gt;);
+            }
+        });
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+&lt;p&gt;During the series we have showed how the RSS reader app can be implemented with &lt;a href=&quot;https://github.com/vert-x3/vertx-cassandra-client&quot;&gt;Vert.x Cassandra client&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Thanks for reading this. I hope you enjoyed reading this series. See you soon on our &lt;a href=&quot;https://gitter.im/eclipse-vertx/vertx-users&quot;&gt;Gitter channel&lt;/a&gt;!&lt;/p&gt;
+&lt;/article&gt;</description>
+	<pubDate>Thu, 06 Dec 2018 00:00:00 +0000</pubDate>
+</item>
+<item>
 	<title>Christian Pontesegger: Jenkins 1: IDE Setup and an Empty Plugin</title>
 	<guid isPermaLink="false">tag:blogger.com,1999:blog-3460102793186140898.post-5182433312839995136</guid>
 	<link>http://codeandme.blogspot.com/2018/11/jenkins-1-ide-setup-and-empty-plugin.html</link>
@@ -22,6 +211,250 @@
 	<description>&lt;p&gt;If you could not attend &lt;a href=&quot;https://www.javafx-days.com/&quot;&gt;my talk at the JavaFX-Days Zürich&lt;/a&gt; yesterday or you did and wanted to recap what you’ve presented. Here are the &lt;a href=&quot;https://tomsondev.bestsolution.at/2018/12/05/slides-from-javafx-days-zurich-on-efxclipse-apis/javafx-days/&quot; rel=&quot;attachment wp-att-5184&quot;&gt;slides&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;I enjoyed the conference and I hope you did as well. See you next year!&lt;/p&gt;</description>
 	<pubDate>Wed, 05 Dec 2018 08:57:45 +0000</pubDate>
+</item>
+<item>
+	<title>Eclipse Ditto: Using Eclipse Hono's Command&amp;Control with Eclipse Ditto</title>
+	<guid isPermaLink="true">https://www.eclipse.org/ditto/2018-12-05-example-command-and-control.html</guid>
+	<link>https://www.eclipse.org/ditto/2018-12-05-example-command-and-control.html</link>
+	<description>&lt;p&gt;With &lt;a href=&quot;https://www.eclipse.org/ditto/release_notes_080.html&quot;&gt;version 0.8.0&lt;/a&gt; Eclipse Ditto can now interact with Eclipse Hono using the 
+&lt;a href=&quot;https://www.eclipse.org/hono/concepts/command-and-control&quot;&gt;Command &amp;amp; Control&lt;/a&gt; feature. It is possible to send a 
+Thing (or Feature) message at the Ditto Message API, which is then forwarded to Hono as a 
+command message. Hono routes the message to the device, which in turn can send a response to the command including a 
+status, telling if the command was successfully processed or not. 
+This response is routed back via Hono to the Ditto Message API.&lt;/p&gt;
+
+&lt;p&gt;In this example we connect the &lt;a href=&quot;https://ditto.eclipse.org/&quot;&gt;Ditto sandbox&lt;/a&gt; and the 
+&lt;a href=&quot;https://www.eclipse.org/hono/sandbox/&quot;&gt;Hono sandbox&lt;/a&gt; to send a message (3) to a simulated device via the 
+Ditto Messages API. The device receives the command from the Hono HTTP Adapter and responds with a message (4) 
+that is routed back to the caller at the Ditto Message API (5). For the sake of simplicity we use simple curl 
+commands both for the Ditto and Hono HTTP APIs.&lt;/p&gt;
+
+&lt;p&gt;The following steps are covered in this example:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Setup a connection between Eclipse Ditto and Hono sandboxes&lt;/li&gt;
+  &lt;li&gt;Signal availability of the device&lt;/li&gt;
+  &lt;li&gt;Send a Ditto message&lt;/li&gt;
+  &lt;li&gt;Device receives command and sends command response&lt;/li&gt;
+  &lt;li&gt;Caller receives response at Ditto Message API&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;img alt=&quot;Command and Control&quot; src=&quot;https://www.eclipse.org/ditto/images/blog/2018-12-14-command-and-control.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;prerequisites-a-ditto-digital-twin-and-a-hono-device&quot;&gt;Prerequisites: A Ditto digital twin and a Hono device&lt;/h3&gt;
+
+&lt;p&gt;The creation of a Hono device and Ditto digital twin has already been covered in the blog post 
+&lt;a href=&quot;https://www.eclipse.org/ditto/2018-05-02-connecting-ditto-hono.html&quot;&gt;Connecting Eclipse Ditto to Eclipse Hono&lt;/a&gt;. For brevity we will just list the 
+required commands to create a twin/device here. For a detailed explanation of the steps please refer to the previous 
+post.&lt;/p&gt;
+
+&lt;h4 id=&quot;create-hono-device&quot;&gt;Create Hono device&lt;/h4&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# setup a tenant&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{&quot;tenant-id&quot;: &quot;org.eclipse.ditto&quot;}'&lt;/span&gt; http://hono.eclipse.org:28080/tenant
+&lt;span class=&quot;c&quot;&gt;# create a device&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{&quot;device-id&quot;: &quot;org.eclipse.ditto:teapot&quot;}'&lt;/span&gt; http://hono.eclipse.org:28080/registration/org.eclipse.ditto
+&lt;span class=&quot;c&quot;&gt;# add device credentials&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ PWD_HASH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'teapot'&lt;/span&gt; | openssl dgst &lt;span class=&quot;nt&quot;&gt;-binary&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-sha512&lt;/span&gt; | base64 &lt;span class=&quot;nt&quot;&gt;-w&lt;/span&gt; 0&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+  &quot;device-id&quot;: &quot;org.eclipse.ditto:teapot&quot;,
+  &quot;type&quot;: &quot;hashed-password&quot;,
+  &quot;auth-id&quot;: &quot;teapot&quot;,
+  &quot;secrets&quot;: [{
+      &quot;hash-function&quot; : &quot;sha-512&quot;,
+      &quot;pwd-hash&quot;: &quot;'&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$PWD_HASH&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&quot;
+  }]
+}'&lt;/span&gt; http://hono.eclipse.org:28080/credentials/org.eclipse.ditto
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;create-ditto-digital-twin&quot;&gt;Create Ditto digital twin&lt;/h4&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# create thing in Ditto&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; PUT &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; demo5:demo &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+    &quot;features&quot;: {
+      &quot;water&quot;: {
+        &quot;properties&quot;: {
+          &quot;temperature&quot;: 20
+        }
+      }
+    }
+}'&lt;/span&gt; https://ditto.eclipse.org/api/2/things/org.eclipse.ditto:teapot 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;setup-a-connection-for-command--control&quot;&gt;Setup a connection for Command &amp;amp; Control&lt;/h3&gt;
+&lt;p&gt;In order to forward Ditto Messages to the device as a Hono command we first need to setup and configure a 
+&lt;a href=&quot;https://www.eclipse.org/ditto/connectivity-manage-connections.html&quot;&gt;connection&lt;/a&gt; between Eclipse Ditto and Eclipse Hono that is prepared for 
+&lt;em&gt;Command &amp;amp; Control&lt;/em&gt; messages. According to the 
+&lt;a href=&quot;https://www.eclipse.org/hono/concepts/command-and-control&quot;&gt;Hono documentation&lt;/a&gt; 
+the connection must contain a target with the address &lt;code class=&quot;highlighter-rouge&quot;&gt;control/&amp;lt;tenant-id&amp;gt;/&amp;lt;device-id&amp;gt;&lt;/code&gt; 
+and a source with the address &lt;code class=&quot;highlighter-rouge&quot;&gt;control/&amp;lt;tenant-id&amp;gt;/&amp;lt;reply-identifier&amp;gt;&lt;/code&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;reply-identifier&lt;/code&gt; can be 
+chosen arbitrarily, but must be set as the &lt;code class=&quot;highlighter-rouge&quot;&gt;reply-to&lt;/code&gt; header of a command exactly as defined in the connection:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; devops:devopsPw1! &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+           &quot;targetActorSelection&quot;: &quot;/system/sharding/connection&quot;,
+           &quot;headers&quot;: {
+             &quot;aggregate&quot;: false
+           },
+           &quot;piggybackCommand&quot;: {
+             &quot;type&quot;: &quot;connectivity.commands:createConnection&quot;,
+             &quot;connection&quot;: {
+               &quot;id&quot;: &quot;command-and-control-connection&quot;,
+               &quot;connectionType&quot;: &quot;amqp-10&quot;,
+               &quot;connectionStatus&quot;: &quot;open&quot;,
+               &quot;uri&quot;: &quot;amqp://consumer%40HONO:verysecret@hono.eclipse.org:15672&quot;,
+               &quot;failoverEnabled&quot;: true,
+               &quot;sources&quot;: [{
+                   &quot;addresses&quot;: [
+                     &quot;control/org.eclipse.ditto/replies&quot;
+                   ],
+                   &quot;authorizationContext&quot;: [
+                     &quot;nginx:demo5&quot;
+                   ],
+                   &quot;headerMapping&quot;: {
+                     &quot;correlation-id&quot;: &quot;{{ header:correlation-id }}&quot;,
+                     &quot;status&quot;: &quot;{{ header:status }}&quot;
+                   }
+                 }
+               ],
+               &quot;targets&quot;: [{
+                   &quot;address&quot;: &quot;control/org.eclipse.ditto/{{ thing:id }}&quot;,
+                   &quot;authorizationContext&quot;: [
+                     &quot;nginx:demo5&quot;
+                   ],
+                   &quot;headerMapping&quot;: {
+                     &quot;correlation-id&quot;: &quot;{{ header:correlation-id }}&quot;,
+                     &quot;subject&quot;: &quot;{{ topic:subject }}&quot;,
+                     &quot;reply-to&quot;: &quot;control/org.eclipse.ditto/replies&quot;
+                   }
+                 }
+               ]
+             }
+           }
+         }'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    https://ditto.eclipse.org/devops/piggyback/connectivity?timeout&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10000
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As described in the 
+&lt;a href=&quot;https://www.eclipse.org/hono/api/command-and-control-api/#send-a-request-response-command&quot;&gt;Hono API description&lt;/a&gt; 
+a command message has three mandatory properties: &lt;code class=&quot;highlighter-rouge&quot;&gt;correlation-id&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;subject&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;reply-to&lt;/code&gt;, these are defined in the 
+target header mapping of the connection. 
+The source header mapping defines a mapping for &lt;code class=&quot;highlighter-rouge&quot;&gt;correlation-id&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;status&lt;/code&gt; to internal headers, they are required 
+to properly map the Hono command response to a Ditto message response.&lt;/p&gt;
+
+&lt;h3 id=&quot;signal-availability-of-device&quot;&gt;Signal availability of device&lt;/h3&gt;
+
+&lt;p&gt;As we are using the Hono HTTP Adapter to connect our device, send telemetry and receive commands, the designated way 
+is therefor to signal readiness to receive a command by specifying the &lt;code class=&quot;highlighter-rouge&quot;&gt;hono-ttd&lt;/code&gt; parameter on an arbitrary event (for 
+detailed description please consult the 
+[Hono HTTP Adapter] (https://www.eclipse.org/hono/user-guide/http-adapter/#specifying-the-time-a-device-will-wait-for-a-response) 
+guide).&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; teapot@org.eclipse.ditto:teapot &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'hono-ttd: 60'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+           &quot;topic&quot;: &quot;org.eclipse.ditto/teapot/things/twin/commands/modify&quot;,
+           &quot;path&quot;: &quot;/features/water/properties/temperature&quot;,
+           &quot;value&quot;: 23
+         }'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     http://hono.eclipse.org:8080/telemetry
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The request is now open to receive a command for 60 seconds before it is terminated.&lt;/p&gt;
+
+&lt;h3 id=&quot;send-a-ditto-message&quot;&gt;Send a Ditto message&lt;/h3&gt;
+
+&lt;p&gt;Now we can use the &lt;a href=&quot;https://www.eclipse.org/ditto/protocol-specification-things-messages.html#using-the-messages-api&quot;&gt;Ditto Messages API&lt;/a&gt; to send a 
+message to the device waiting for a command:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;s1&quot;&gt;'https://ditto.eclipse.org/api/2/things/org.eclipse.ditto:teapot/inbox/messages/brew?timeout=60'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; demo5:demo &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'x-correlation-id: command-and-control'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{&quot;targetTemperature&quot;:85}'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;device-receives-the-command&quot;&gt;Device receives the command&lt;/h3&gt;
+
+&lt;p&gt;The message is forwarded to Hono as configured in the connection and finally terminates the pending request we opened 
+before with a status code of &lt;code class=&quot;highlighter-rouge&quot;&gt;200 OK&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;HTTP/1.1 200 OK
+hono-command: brew
+hono-cmd-req-id: 013command-and-controlreplies
+Content-Type: application/octet-stream
+Content-Length: 17
+Connection: Keep-Alive
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Hono adds two headers besides the standard HTTP headers: &lt;code class=&quot;highlighter-rouge&quot;&gt;hono-command&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;hono-cmd-req-id&lt;/code&gt;. 
+&lt;code class=&quot;highlighter-rouge&quot;&gt;hono-command&lt;/code&gt; contains the subject of the message and &lt;code class=&quot;highlighter-rouge&quot;&gt;hono-cmd-req-id&lt;/code&gt; identifies the messages and is used to 
+correlate the request and the response we are now going to send.&lt;/p&gt;
+
+&lt;h3 id=&quot;device-sends-a-command-response&quot;&gt;Device sends a command response&lt;/h3&gt;
+
+&lt;p&gt;We use the header value of &lt;code class=&quot;highlighter-rouge&quot;&gt;hono-cmd-req-id&lt;/code&gt; to construct the response address: 
+&lt;code class=&quot;highlighter-rouge&quot;&gt;http://hono.eclipse.org:8080/control/res/013command-and-controlreplies&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Another curl command completes the roundtrip with a response from the simulated device:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-X&lt;/span&gt; POST &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; teapot@org.eclipse.ditto:teapot &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'Content-Type: application/json'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-H&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'hono-cmd-status: 200'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+           &quot;topic&quot;: &quot;org.eclipse.ditto/teapot/things/live/messages/brew&quot;,
+           &quot;headers&quot;: {
+             &quot;content-type&quot;: &quot;application/json&quot;,
+             &quot;correlation-id&quot;: &quot;command-and-control&quot;
+           },
+           &quot;path&quot;: &quot;/inbox/messages/brew&quot;,
+           &quot;value&quot;: { &quot;eta&quot;: 56},
+           &quot;status&quot;: 200
+         }'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+     http://hono.eclipse.org:8080/control/res/013command-and-controlreplies
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;message-response-is-received-at-ditto-message-api&quot;&gt;Message response is received at Ditto Message API&lt;/h3&gt;
+&lt;p&gt;And finally we receive the command response at the Ditto Message API where we sent the original message:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;HTTP/1.1 200 OK
+correlation-id: command-and-control
+message-id: command-and-control
+status: 200
+Content-Type: application/json
+Content-Length: 10
+
+{&quot;eta&quot;:56}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;alternative-receive-command-and-send-response-via-mqtt&quot;&gt;Alternative: Receive command and send response via MQTT&lt;/h3&gt;
+
+&lt;p&gt;Alternatively we can also receive the command by subscribing to the MQTT topic &lt;code class=&quot;highlighter-rouge&quot;&gt;control/+/+/req/#&lt;/code&gt; at the 
+&lt;a href=&quot;https://www.eclipse.org/hono/user-guide/mqtt-adapter/#command-control&quot;&gt;Hono MQTT Adapter&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mosquitto_sub &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-h&lt;/span&gt; hono.eclipse.org &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8883 &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'teapot@org.eclipse.ditto'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; teapot &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'control/+/+/req/#'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And also publish the command response on the MQTT topic &lt;code class=&quot;highlighter-rouge&quot;&gt;control///res/013command-and-controlreplies/200&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mosquitto_pub &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-h&lt;/span&gt; hono.eclipse.org &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; 8883 &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'teapot@org.eclipse.ditto'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt; teapot &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+              &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; control///res/013command-and-controlreplies/200 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+              &lt;span class=&quot;nt&quot;&gt;-m&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{
+                    &quot;topic&quot;: &quot;org.eclipse.ditto/teapot/things/live/messages/brew&quot;,
+                    &quot;headers&quot;: {
+                      &quot;content-type&quot;: &quot;application/json&quot;,
+                      &quot;correlation-id&quot;: &quot;command-and-control&quot;
+                    },
+                    &quot;path&quot;: &quot;/inbox/messages/brew&quot;,
+                    &quot;value&quot;: {
+                      &quot;eta&quot;: 58
+                    },
+                    &quot;status&quot;: 200
+                  }'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you have any wishes, improvements, are missing something
+or just want to get in touch with us, you can use one of
+our &lt;a href=&quot;https://www.eclipse.org/ditto/feedback.html&quot;&gt;feedback channels&lt;/a&gt;.&lt;/p&gt;
+
+&lt;figure&gt;&lt;img alt=&quot;Ditto&quot; class=&quot;docimage&quot; src=&quot;https://www.eclipse.org/ditto/images/ditto.svg&quot; /&gt;&lt;/figure&gt;
+
+&lt;p&gt;–&lt;br /&gt;
+The Eclipse Ditto team&lt;/p&gt;</description>
+	<pubDate>Wed, 05 Dec 2018 05:00:00 +0000</pubDate>
 </item>
 <item>
 	<title>Tom Schindl: Announcing e(fx)clipse DriftFX – Integrating Native Rendering Pipelines into JavaFX</title>
@@ -424,61 +857,6 @@ options as a command line parameter:&lt;/p&gt;
 	<description>Our builder UI is progressing: today we will add a text box with nice defaults and add input validation to it.&lt;br /&gt;&lt;br /&gt;&lt;u&gt;&lt;b&gt;Jenkins Tutorials&lt;/b&gt;&lt;/u&gt;&lt;br /&gt;&lt;br /&gt;For a list of all jenkins related tutorials see &lt;a href=&quot;https://codeandme.blogspot.com/p/jenkins-articles.html&quot; target=&quot;_blank&quot;&gt;Jenkins Tutorials Overview.&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;&lt;div&gt;Source code for this tutorial is available on github as a &lt;a href=&quot;https://github.com/Pontesegger/codeandme/blob/master/Code%20&amp;amp;%20Me%20Blog/jenkins_03_text_input.zip?raw=true&quot;&gt;single zip archive&lt;/a&gt;, as a &lt;a href=&quot;https://github.com/Pontesegger/codeandme/blob/master/Code%20&amp;amp;%20Me%20Blog/jenkins_03_text_input.psf?raw=true&quot;&gt;Team Project Set&lt;/a&gt; or you can &lt;a href=&quot;https://github.com/Pontesegger/codeandme/tree/master/jenkins/03_text_input&quot; target=&quot;_blank&quot;&gt;browse the files&lt;/a&gt; online.&lt;br /&gt;&lt;br /&gt;&lt;/div&gt;&lt;b&gt;&lt;u&gt;Step 1: The Text Box&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Adding a text box is as simple as adding the checkbox before. Add a new entry to the &lt;i&gt;config.jelly&lt;/i&gt; file:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt; &amp;lt;f:entry title=&quot;Custom build message&quot; field=&quot;buildMessage&quot;&amp;gt;&lt;br /&gt;  &amp;lt;f:textbox /&amp;gt;&lt;br /&gt; &amp;lt;/f:entry&amp;gt;&lt;/pre&gt;Make sure you use a unique ID for &lt;i&gt;field&lt;/i&gt;. Then add the new field to your builder by adding it to the constructor and create a getter for it:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;public class HelloBuilder extends Builder implements SimpleBuildStep {&lt;br /&gt;&lt;br /&gt; private String fBuildMessage;&lt;br /&gt;&lt;br /&gt; @DataBoundConstructor&lt;br /&gt; public HelloBuilder(boolean failBuild, String buildMessage) {&lt;br /&gt;  fFailBuild = failBuild;&lt;br /&gt;  fBuildMessage = buildMessage;&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; @Override&lt;br /&gt; public void perform(Run&amp;lt;?, ?&amp;gt; run, FilePath workspace, Launcher launcher, TaskListener listener)&lt;br /&gt;   throws InterruptedException, IOException {&lt;br /&gt;  listener.getLogger().println(getBuildMessage());&lt;br /&gt;  &lt;br /&gt;  if (isFailBuild())&lt;br /&gt;   throw new AbortException(&quot;Build error forced by plugin settings&quot;);&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; public String getBuildMessage() {&lt;br /&gt;  return fBuildMessage;&lt;br /&gt; }&lt;br /&gt;}&lt;/pre&gt;All done, give it a try!&lt;br /&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Step 2: Default Value&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Some example data might help our users when filling out the buid parameters. Therefore lets provide a nice default value. This is done by adding a &lt;i&gt;default&lt;/i&gt; attribute to the textbox:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;&amp;lt;f:textbox default=&quot;${descriptor.getDefaultBuildMessage()}&quot; /&amp;gt;&lt;/pre&gt;We could have provided the default text directly in the attribute data. Instead we decided to fetch the default dynamically from the &lt;i&gt;Descriptor&lt;/i&gt; class. No magic data binding here, so we need to implement the method:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt; public static final class Descriptor extends BuildStepDescriptor&amp;lt;Builder&amp;gt; {&lt;br /&gt;  &lt;br /&gt;  public String getDefaultBuildMessage() {&lt;br /&gt;   return &quot;This is a great build&quot;;&lt;br /&gt;  }&lt;br /&gt; }&lt;br /&gt;&lt;/pre&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;u&gt;&lt;b&gt;Step 3: Input Validation&lt;/b&gt;&lt;/u&gt;&lt;br /&gt;&lt;br /&gt;Having no build message would result in an empty log file, which is not what we want. With input validation we can force users to enter some text to the input box. Validation is done by providing a validator in the &lt;i&gt;Descriptor&lt;/i&gt; class:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt; public static final class Descriptor extends BuildStepDescriptor&amp;lt;Builder&amp;gt; {&lt;br /&gt;&lt;br /&gt;  public FormValidation doCheckBuildMessage(@QueryParameter String buildMessage) {&lt;br /&gt;   if (buildMessage.isEmpty())&lt;br /&gt;    return FormValidation.error(&quot;Please provide a build message.&quot;);&lt;br /&gt;   else if (buildMessage.trim().isEmpty())&lt;br /&gt;    return FormValidation.error(&quot;White space is not sufficient for a build message.&quot;);&lt;br /&gt;   else&lt;br /&gt;    return FormValidation.ok();&lt;br /&gt;  }&lt;br /&gt; }&lt;/pre&gt;The method name needs to stick to the pattern &lt;i&gt;doCheck&amp;lt;Parameter&amp;gt;&lt;/i&gt;. Normally you would only provide the parameter in question to that method (again the parameter name needs to match your &lt;i&gt;field&lt;/i&gt; ID) but if needed you could add parameters for other fields of the builder. This comes in handy when parameters depend on each other.</description>
 	<pubDate>Wed, 28 Nov 2018 10:07:21 +0000</pubDate>
 	<author>noreply@blogger.com (Christian Pontesegger)</author>
-</item>
-<item>
-	<title>Christian Pontesegger: Jenkins 2: A Builder Plugin &amp; Some Jelly</title>
-	<guid isPermaLink="false">tag:blogger.com,1999:blog-3460102793186140898.post-7581451498191257505</guid>
-	<link>http://codeandme.blogspot.com/2018/11/jenkins-2-builder-plugin-some-jelly.html</link>
-	<description>In the previous tutorial we did the basic setup for jenkins plugin development. Now we will try to create a plugin that actually runs a build step.&lt;br /&gt;&lt;br /&gt;&lt;u&gt;&lt;b&gt;Jenkins Tutorials&lt;/b&gt;&lt;/u&gt;&lt;br /&gt;&lt;br /&gt;For a list of all jenkins related tutorials see &lt;a href=&quot;https://codeandme.blogspot.com/p/jenkins-articles.html&quot; target=&quot;_blank&quot;&gt;Jenkins Tutorials Overview.&lt;/a&gt;&lt;br /&gt;&lt;br /&gt;&lt;div&gt;&lt;div style=&quot;margin: 0px;&quot;&gt;Source code for this tutorial is available on github as a &lt;a href=&quot;https://github.com/Pontesegger/codeandme/blob/master/Code%20&amp;amp;%20Me%20Blog/jenkins_02_builder_plugin.zip?raw=true&quot;&gt;single zip archive&lt;/a&gt;, as a &lt;a href=&quot;https://github.com/Pontesegger/codeandme/blob/master/Code%20&amp;amp;%20Me%20Blog/jenkins_02_builder_plugin.psf?raw=true&quot;&gt;Team Project Set&lt;/a&gt; or you can &lt;a href=&quot;https://github.com/Pontesegger/codeandme/tree/master/jenkins/02_builder_plugin&quot; target=&quot;_blank&quot;&gt;browse the files&lt;/a&gt; online.&lt;/div&gt;&lt;/div&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Step 1: The Basic Builder&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Maven allows to create a nice template for a builder plugin by calling&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;mvn archetype:generate -Dfilter=io.jenkins.archetypes:&lt;/pre&gt;then select the &lt;i&gt;hello-world-plugin&lt;/i&gt;. But as we want to do it the hard way, we will add every single bit on our own and continue with the &lt;a href=&quot;https://github.com/Pontesegger/codeandme/tree/master/jenkins/01_empty_plugin&quot; target=&quot;_blank&quot;&gt;empty project&lt;/a&gt; from our &lt;a href=&quot;https://codeandme.blogspot.com/2018/11/jenkins-1-ide-setup-and-empty-plugin.html&quot; target=&quot;_blank&quot;&gt;previous tutorial&lt;/a&gt;.&lt;br /&gt;&lt;br /&gt;The first thing we need is a class to implement our builder. Lets create a simple one. Create a new class &lt;i&gt;com.codeandme.jenkins.builder.HelloBuilder&lt;/i&gt;:&lt;br /&gt;&lt;pre class=&quot;brush: java&quot;&gt;package com.codeandme.jenkins.builder;&lt;br /&gt;&lt;br /&gt;import java.io.IOException;&lt;br /&gt;&lt;br /&gt;public class HelloBuilder extends Builder implements SimpleBuildStep {&lt;br /&gt;&lt;br /&gt; @DataBoundConstructor&lt;br /&gt; public HelloBuilder() {&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; @Override&lt;br /&gt; public void perform(Run&amp;lt;?, ?&amp;gt; run, FilePath workspace, Launcher launcher, TaskListener listener)&lt;br /&gt;   throws InterruptedException, IOException {&lt;br /&gt;  listener.getLogger().println(&quot;This is the Hello plugin!&quot;);&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; @Symbol(&quot;hello&quot;)&lt;br /&gt; @Extension&lt;br /&gt; public static final class Descriptor extends BuildStepDescriptor&amp;lt;Builder&amp;gt; {&lt;br /&gt;&lt;br /&gt;  @Override&lt;br /&gt;  public boolean isApplicable(Class&amp;lt;? extends AbstractProject&amp;gt; aClass) {&lt;br /&gt;   return true;&lt;br /&gt;  }&lt;br /&gt;&lt;br /&gt;  @Override&lt;br /&gt;  public String getDisplayName() {&lt;br /&gt;   return &quot;Code &amp;amp; Me - Hello World&quot;;&lt;br /&gt;  }&lt;br /&gt; }&lt;br /&gt;}&lt;br /&gt;&lt;/pre&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;Jenkins expects the constructor to be augmented with the &lt;i&gt;@DataBoundConstructor&lt;/i&gt; annotation. Later we will add our build parameters to it.&lt;br /&gt;&lt;br /&gt;The &lt;i&gt;perform()&lt;/i&gt; method is the heart of our implementation. This is where we define what the build step should actually do. In this tutorial we focus on the definition, not the execution so we are just printing some log message to detect that our build step got triggered.&lt;br /&gt;&lt;br /&gt;Now lets put our focus on the &lt;i&gt;Descriptor&lt;/i&gt; class. It actually describes what our plugin looks like, what parameter it uses and whether the user input is valid or not. You need to use a static class as a descriptor and augment it with the &lt;i&gt;@Extension&lt;/i&gt; annotation to allow jenkins to detect it automatically.&lt;br /&gt;&lt;br /&gt;&lt;i&gt;isApplicable()&lt;/i&gt; might be the most important one as it denotes if ou plugin is usable for the current project type.&lt;br /&gt;&lt;br /&gt;Start a jenkins test server using&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;mvn hpi:run -Djetty.port=8090&lt;/pre&gt;Create a new &lt;i&gt;Freestyle Project&lt;/i&gt; and add your custom build step to it. Then execute the job and browse the log for our log message.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Step 2: Basic UI&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Next we need a &lt;i&gt;*.jelly&lt;/i&gt; file to describe how the UI should look like. Therefore create a new package in &lt;i&gt;src/main/resources&lt;/i&gt; named &lt;i&gt;com.codeandme.jenkins.builder.HelloBuilder&lt;/i&gt;. That is right, the package equals the class name of our builder class. Then create a &lt;i&gt;config.jelly&lt;/i&gt; file inside that package:&lt;br /&gt;&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;&amp;lt;?jelly escape-by-default='true'?&amp;gt;&lt;br /&gt;&amp;lt;j:jelly xmlns:j=&quot;jelly:core&quot; xmlns:st=&quot;jelly:stapler&quot; xmlns:d=&quot;jelly:define&quot; xmlns:l=&quot;/lib/layout&quot; xmlns:t=&quot;/lib/hudson&quot; xmlns:f=&quot;/lib/form&quot;&amp;gt;&lt;br /&gt;&lt;br /&gt; &amp;lt;f:block&amp;gt;&lt;br /&gt;  &amp;lt;h1&amp;gt;Code &amp;amp;amp; Me Productions&amp;lt;/h1&amp;gt;&lt;br /&gt;  &amp;lt;p&amp;gt;We build the best &amp;lt;i&amp;gt;hellos&amp;lt;/i&amp;gt; in the world&amp;lt;/p&amp;gt;&lt;br /&gt; &amp;lt;/f:block&amp;gt;&lt;br /&gt;&lt;br /&gt;&amp;lt;/j:jelly&amp;gt;&lt;br /&gt;&lt;/pre&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;Inside the jelly definition we can use plain HTML code. Run your test instance again to see your changes in your project configuration view.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Step 3: Checkbox Input&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Time to add some input. All build parameters need at least 2 steps of implementation: first we need to define the UI in the &lt;i&gt;config.jelly&lt;/i&gt; file, then we need to define the parameters in the java class. Optionally we may add additional checks in the Descriptor class.&lt;br /&gt;&lt;br /&gt;To define the UI for the checkbox we add following code to our jelly file:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt; &amp;lt;f:entry title=&quot;Fail this build&quot; field=&quot;failBuild&quot;&amp;gt;&lt;br /&gt;  &amp;lt;f:checkbox /&amp;gt;&lt;br /&gt; &amp;lt;/f:entry&amp;gt;&lt;/pre&gt;This will create a label using the &lt;i&gt;title&lt;/i&gt; field and a checkbox on the right side of the label. The &lt;i&gt;field&lt;/i&gt; name is important as this is the ID of our field which we now use in the Java code:&lt;br /&gt;&lt;pre class=&quot;brush: xml&quot;&gt;public class HelloBuilder extends Builder implements SimpleBuildStep {&lt;br /&gt;&lt;br /&gt; private boolean fFailBuild;&lt;br /&gt;&lt;br /&gt; @DataBoundConstructor&lt;br /&gt; public HelloBuilder(boolean failBuild) {&lt;br /&gt;  fFailBuild = failBuild;&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; @Override&lt;br /&gt; public void perform(Run&amp;lt;?, ?&amp;gt; run, FilePath workspace, Launcher launcher, TaskListener listener)&lt;br /&gt;   throws InterruptedException, IOException {&lt;br /&gt;  listener.getLogger().println(&quot;This is the Hello plugin!&quot;);&lt;br /&gt;&lt;br /&gt;  if (isFailBuild())&lt;br /&gt;   throw new AbortException(&quot;Build error forced by plugin settings&quot;);&lt;br /&gt; }&lt;br /&gt;&lt;br /&gt; public boolean isFailBuild() {&lt;br /&gt;  return fFailBuild;&lt;br /&gt; }&lt;br /&gt;}&lt;br /&gt;&lt;/pre&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;The new parameter needs to be added to our constructor. Make sure you use the same name as in the jelly file. Additionally we need a getter for our parameter. It will be queried to populate the UI when you configure your job and when the job gets executed. Jenkins expects the name of the getter to match the field name of your jelly file.&lt;br /&gt;&lt;br /&gt;During the build we evaluate our parameter and throw an &lt;i&gt;AbortException&lt;/i&gt; in case our builder is expected to fail.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Step 4: Adding Help&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Lots of parameters in Jenkins plugins show a help button on the righthand side of the form. These buttons automatically appear when corresponding help files exist in the right location.&lt;br /&gt;&lt;br /&gt;A general help file for the builder named &lt;i&gt;help.html&lt;/i&gt; needs to be placed next to the &lt;i&gt;config.jelly&lt;/i&gt; file. You may add any arbitrary HTML content there, with no need to use &lt;i&gt;&amp;lt;html&amp;gt;&lt;/i&gt; or &lt;i&gt;&amp;lt;body&amp;gt;&lt;/i&gt; tags.&lt;br /&gt;&lt;br /&gt;To provide help for our checkbox we create another help file named &lt;i&gt;help-failBuild.html&lt;/i&gt;. See the pattern? We again use the field ID and Jenkins figures out the rest.&lt;br /&gt;&lt;br /&gt;Instead of a plain HTML files we could also &lt;a href=&quot;https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins#BasicguidetoJellyusageinJenkins-Helpfiles&quot; target=&quot;_blank&quot;&gt;provide jelly files&lt;/a&gt; following the same name pattern.&lt;br /&gt;&lt;br /&gt;Changes like adding help or beautifying jelly files can be done without restarting our test instance. Simply change the file and reload the page in your webbrowser of your test instance.&lt;br /&gt;&lt;br /&gt;&lt;b&gt;&lt;u&gt;Further reading&lt;/u&gt;&lt;/b&gt;&lt;br /&gt;&lt;br /&gt;Good documentation on writing forms seems to be rare on the internet. To me the best choice seems to be to find an existing plugin and browse the source code for reference. At least a &lt;a href=&quot;https://reports.jenkins.io/core-taglib/jelly-taglib-ref.html#form&quot; target=&quot;_blank&quot;&gt;list of all control types&lt;/a&gt; is available online.&lt;/div&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;&lt;br /&gt;&lt;/div&gt;</description>
-	<pubDate>Wed, 28 Nov 2018 09:21:30 +0000</pubDate>
-	<author>noreply@blogger.com (Christian Pontesegger)</author>
-</item>
-<item>
-	<title>Maximilian and Jonas: How to inversify() in Eclipse Theia</title>
-	<guid isPermaLink="false">https://eclipsesource.com/?p=40623</guid>
-	<link>https://eclipsesource.com/blogs/2018/11/28/how-to-inversify-in-eclipse-theia/</link>
-	<description>&lt;p&gt;In this article we will describe the basic concepts of dependency injection with inversify, which are required to implement extensions for...&lt;/p&gt;
-&lt;p&gt;The post &lt;a href=&quot;https://eclipsesource.com/blogs/2018/11/28/how-to-inversify-in-eclipse-theia/&quot; rel=&quot;nofollow&quot;&gt;How to inversify() in Eclipse Theia&lt;/a&gt; appeared first on &lt;a href=&quot;https://eclipsesource.com&quot; rel=&quot;nofollow&quot;&gt;EclipseSource&lt;/a&gt;.&lt;/p&gt;</description>
-	<pubDate>Wed, 28 Nov 2018 09:15:49 +0000</pubDate>
-</item>
-<item>
-	<title>Eclipse Ditto: Announcing Eclipse Ditto Release 0.8.0</title>
-	<guid isPermaLink="true">https://www.eclipse.org/ditto/2018-11-28-release-announcement-080.html</guid>
-	<link>https://www.eclipse.org/ditto/2018-11-28-release-announcement-080.html</link>
-	<description>&lt;p&gt;Today the Eclipse Ditto team proudly presents its first release 
-&lt;a href=&quot;https://projects.eclipse.org/projects/iot.ditto/releases/0.8.0&quot;&gt;0.8.0&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Please have a look at the &lt;a href=&quot;https://www.eclipse.org/ditto/release_notes_080.html&quot;&gt;0.8.0 release notes&lt;/a&gt; for a more detailled information on the release.&lt;/p&gt;
-
-&lt;p&gt;The main changes and new features since the latest milestone &lt;a href=&quot;https://www.eclipse.org/ditto/release_notes_080-M3.html&quot;&gt;0.8.0-M3&lt;/a&gt; are:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Support Eclipse Hono’s command&amp;amp;control in Ditto connectivity&lt;/li&gt;
-  &lt;li&gt;several smaller bugfixes&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;artifacts&quot;&gt;Artifacts&lt;/h2&gt;
-
-&lt;p&gt;The new Java artifacts have been published at the &lt;a href=&quot;https://repo.eclipse.org/content/repositories/ditto/&quot;&gt;Eclipse Maven repository&lt;/a&gt;
-as well as &lt;a href=&quot;https://repo1.maven.org/maven2/org/eclipse/ditto/&quot;&gt;Maven central&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;The Docker images have been pushed to Docker Hub:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-policies/&quot;&gt;eclipse/ditto-policies&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-things/&quot;&gt;eclipse/ditto-things&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-things-search/&quot;&gt;eclipse/ditto-things-search&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-gateway/&quot;&gt;eclipse/ditto-gateway&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-connectivity/&quot;&gt;eclipse/ditto-connectivity&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://hub.docker.com/r/eclipse/ditto-concierge/&quot;&gt;eclipse/ditto-concierge&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;br /&gt;
-&lt;br /&gt;&lt;/p&gt;
-&lt;figure&gt;&lt;img alt=&quot;Ditto&quot; class=&quot;docimage&quot; src=&quot;https://www.eclipse.org/ditto/images/ditto.svg&quot; /&gt;&lt;/figure&gt;
-
-&lt;p&gt;–&lt;br /&gt;
-The Eclipse Ditto team&lt;/p&gt;</description>
-	<pubDate>Wed, 28 Nov 2018 05:00:00 +0000</pubDate>
 </item>
 
 </channel>

@@ -18,25 +18,29 @@ public class Launchpad
 	OscMessage myMatrixMessage; 
 	
 	ConfigTable MyTestconfigTable;
-	Long CompareCheckSum = 0L;
 	String LastOneStr = "";
 	Boolean IsSendData;
 	
 	Launchpad(PApplet p)
 	{
 		parent = p;
-		InitPosition();
+		
 		MyColor = new ColorMappingTable(); 
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
+		
+		MainMatrix = new ArrayList<Particle>();   
+		for(int _note = 0;_note < 128; _note++)		//Launchpad has 128 notes 
+			MainMatrix.add(new Particle(parent));
+		
+		InitPosition_center();
 		
 		//Test
 		MyTestconfigTable = new ConfigTable();
 		MyTestconfigTable.initialize("JSON_File");
 	}
 
-	public void InitPosition()
+	public void InitPosition_center()				// Initial note 36~99
 	{
-		MainMatrix = new ArrayList<Particle>();  
 		int Init_rectX = 0;
 		for(int BeginValue = 0;BeginValue < 64; BeginValue+=32)
 		{
@@ -53,7 +57,8 @@ public class Launchpad
 				{
 					rectX = rectX + SlotSize + SlotGapX;
 				}
-				MainMatrix.add(new Particle(parent,rectX,rectY,SlotSize));
+				Particle P1 = MainMatrix.get(i+36); 
+				P1.SetPosition(rectX,rectY,SlotSize);
 			} 
 			Init_rectX = (SlotSize*MatrixWidth/2)+(SlotGapX*(MatrixWidth/2));
 		}	
@@ -61,7 +66,7 @@ public class Launchpad
 
 	public void update(int Note,int Volicity)
 	{
-		int index = Note - 36;
+		int index = Note;
 		Particle P1 = MainMatrix.get(index); 
 		P1.SetColor(Volicity);
 	}
@@ -89,30 +94,13 @@ public class Launchpad
 	{
 		myMatrixMessage.clearArguments();
 		String tempStr = "";
-		
-		/*
-		for (int i = 0; i < MainMatrix.size(); i ++)
-		{
-			Particle P1 = MainMatrix.get(i);
-			myMatrixMessage.add(P1.MyVolicity);
-		}
-		*/
-		
-		/*
-		for (int i = 0; i < MainMatrix.size(); i ++)
-		{
-			Particle P1 = MainMatrix.get(i);
-			tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
-		}
-		*/
-		
+
 		for (int i = 0; i < MyTestconfigTable.Matrix_SettingList.size(); i ++)
 		{
 			SettingRule setting = MyTestconfigTable.Matrix_SettingList.get(i);
 			
-			Particle P1 = MainMatrix.get(setting.Note-36);
+			Particle P1 = MainMatrix.get(setting.Note);
 			tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
-			//CompareCheckSum = CompareCheckSum + (setting.Note * i * P1.MyVolicity);
 		}
 		
 		if(LastOneStr.equals(tempStr))
