@@ -11,12 +11,15 @@ public class MatrixClassProject extends PApplet{
 	NetAddress TestLocation;
 	
 	Launchpad NewLaunchpad;
+	Launchpad NewLaunchpad_2;
+	
+	OscMessage myMatrixMessage;
+	ConfigTable NewConfig;
+	
+	
 	int tempVelocity = 0;
 	int tempNote = 0;
 	Stripe[] stripes = new Stripe[50];
-	//ConfigTable configTable;
-	
-	
 	
 	public static void main(String[] args) {
 		PApplet.main("MatrixClassProject");
@@ -24,7 +27,7 @@ public class MatrixClassProject extends PApplet{
 	
 	public void settings() 
 	{
-		size(200,200);
+		size(300,300);
 		//fullScreen(1);
 	}
 
@@ -32,33 +35,78 @@ public class MatrixClassProject extends PApplet{
 	{
 		background(50);
 		surface.setResizable(true);
-		
+		noStroke(); // no border line
+		//smooth();
 		frameRate(60);	// 60Hz
+		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
 		AbletonliveLocation = new NetAddress("127.0.0.1",8000);
-		
 		TestLocation = new NetAddress("10.1.1.2",7700);
-		noStroke(); // no border line
-		NewLaunchpad = new Launchpad(this);
+		
+		NewLaunchpad = new Launchpad(this,"/PitchAndVelocity");
+		//NewLaunchpad_2 = new Launchpad(this,"/PitchAndVelocity_Pad2");
+		
+		
+		
+		NewConfig = new ConfigTable();
+		NewConfig.initialize("JSON_File");
+		myMatrixMessage = new OscMessage("/MatrixVelocity");
 	}
 
-	public void draw() 
+	public void draw()     
 	{
-		background(0);
-		smooth();
-		noStroke();
 		NewLaunchpad.display();
 		
-		NewLaunchpad.PackMyOSCMessage();
-		if(NewLaunchpad.IsSendData == true) 
+
+		for (int i = 0; i < NewConfig.StationList.size(); i ++)
 		{
-			oscP5.send(NewLaunchpad.myMatrixMessage, myRemoteLocation);
+			Station TempStation = NewConfig.StationList.get(i);
+			TempStation.IsSendData = false;		
+	
+			myMatrixMessage.clearArguments();
+			String tempStr = "";
+
+			for (int j = 0; j < TempStation.SettingList.size(); j ++)
+			{
+				SettingRule setting = TempStation.SettingList.get(j);
+				
+				Particle P1 = NewLaunchpad.MainMatrix.get(setting.Note);
+				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
+			}
+			
+			if(TempStation.LastOneStr.equals(tempStr))
+			{
+				TempStation.IsSendData = false;
+			}
+			else
+			{
+				TempStation.IsSendData = true;
+			}
+			
+			TempStation.LastOneStr = tempStr;
+			myMatrixMessage.add(tempStr);
+
+			if(TempStation.IsSendData == true) 
+			{
+				oscP5.send(myMatrixMessage, TempStation.NetSettings);
+			}
 		}
+
 	}
 	
 	void oscEvent(OscMessage theOscMessage) 
 	{
+		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
+		if(temp_Addr.equals("/PitchAndVelocity"))
+		{
+			tempNote = theOscMessage.get(0).intValue();
+			tempVelocity = theOscMessage.get(1).intValue(); 
+			NewLaunchpad.update(tempNote,tempVelocity);	
+		}
+		
+		
+		/*
 		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
 		if(temp_Addr.equals("/PitchAndVelocity"))
 		{
@@ -91,6 +139,7 @@ public class MatrixClassProject extends PApplet{
 			//else
 			//  println("Note:"+tempNote+",Volicity:"+tempVelocity);
 		}
+		*/
 	}
 	public void mousePressed() 
 	{

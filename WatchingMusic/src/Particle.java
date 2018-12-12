@@ -1,7 +1,6 @@
 import processing.core.*;
 
 public class Particle {
-	//Color ParticleColor;
 	private int colorR;
 	private int colorG;
 	private int colorB;
@@ -164,7 +163,6 @@ public class Particle {
 		colorG = colorTable[Volicity][1];	
 		colorB = colorTable[Volicity][2];	
 		MyVolicity = Volicity;
-		//ParticleColor = _ParticleColor; 
 	}
 
 	public void SetPosition(int _x,int _y,int _size)
@@ -181,9 +179,7 @@ public class Particle {
 	
 	public void display()
 	{
-		//parent.fill(ParticleColor.getRed(),ParticleColor.getGreen(),ParticleColor.getBlue());
 		parent.fill(colorR,colorG,colorB);
-		//parent.fill(ParticleColor);
 		draw(shape);
 	}
 	

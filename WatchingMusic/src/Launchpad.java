@@ -17,14 +17,14 @@ public class Launchpad
 	PApplet parent; // The parent PApplet that we will render ourselves onto
 	OscMessage myMatrixMessage; 
 	
-	ConfigTable MyTestconfigTable;
-	String LastOneStr = "";
-	Boolean IsSendData;
+	//ConfigTable MyTestconfigTable;
+	String OscAddress = "";
 	
-	Launchpad(PApplet p)
+	Launchpad(PApplet _p,String _OscAddress)
 	{
-		parent = p;
-		
+		parent = _p;
+		OscAddress = _OscAddress;
+				
 		MyColor = new ColorMappingTable(); 
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
@@ -35,8 +35,8 @@ public class Launchpad
 		InitPosition_center();
 		
 		//Test
-		MyTestconfigTable = new ConfigTable();
-		MyTestconfigTable.initialize("JSON_File");
+		//MyTestconfigTable = new ConfigTable();
+		//MyTestconfigTable.initialize("JSON_File");
 	}
 
 	public void InitPosition_center()				// Initial note 36~99
@@ -83,37 +83,12 @@ public class Launchpad
 
 	public void display()
 	{
+		parent.background(0);
 		for (int i = 0; i < MainMatrix.size(); i ++)
 		{
 			Particle P1 = MainMatrix.get(i);
 			P1.display();
 		}
 	}
-	
-	public void PackMyOSCMessage()
-	{
-		myMatrixMessage.clearArguments();
-		String tempStr = "";
 
-		for (int i = 0; i < MyTestconfigTable.Matrix_SettingList.size(); i ++)
-		{
-			SettingRule setting = MyTestconfigTable.Matrix_SettingList.get(i);
-			
-			Particle P1 = MainMatrix.get(setting.Note);
-			tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
-		}
-		
-		if(LastOneStr.equals(tempStr))
-		{
-			IsSendData = false;
-		}
-		else
-		{
-			IsSendData = true;
-		}
-		
-				
-		LastOneStr = tempStr;
-		myMatrixMessage.add(tempStr);
-	}
 }
