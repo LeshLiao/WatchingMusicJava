@@ -4,17 +4,9 @@ public class ConfigTable
 {
 	ArrayList<Station> StationList;
 	
-	//ArrayList<SettingRule> Matrix_SettingList;
-	//ArrayList<SettingRule> Top_SettingList;
-	
-	
-	
 	public ConfigTable() 
 	{
 		StationList = new ArrayList<Station>();
-		
-		//Matrix_SettingList = new ArrayList<SettingRule>();
-		//Top_SettingList = new ArrayList<SettingRule>();
 	}
 	
 	public boolean initialize(String FileName)
@@ -23,11 +15,14 @@ public class ConfigTable
 		
 		StationList.add(new Station("Led 54 Par Light","10.1.1.12",2346));
 		TempStation = StationList.get(StationList.size() - 1);
-		TempStation.SettingList.add(new SettingRule(true,31,0,0));
-		TempStation.SettingList.add(new SettingRule(true,30,0,1));
-		TempStation.SettingList.add(new SettingRule(true,29,0,2));
-		TempStation.SettingList.add(new SettingRule(true,28,0,3));
-		
+//		TempStation.SettingList.add(new SettingRule(true,31,0,0));
+//		TempStation.SettingList.add(new SettingRule(true,30,0,1));
+//		TempStation.SettingList.add(new SettingRule(true,29,0,2));
+//		TempStation.SettingList.add(new SettingRule(true,28,0,3));
+		TempStation.SettingList.add(new SettingRule(true,112,0,0));
+		TempStation.SettingList.add(new SettingRule(true,113,0,1));
+		TempStation.SettingList.add(new SettingRule(true,114,0,2));
+		TempStation.SettingList.add(new SettingRule(true,115,0,3));
 
 		StationList.add(new Station("Led Matrix pad","10.1.1.6",2346));
 		TempStation = StationList.get(StationList.size() - 1);

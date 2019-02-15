@@ -47,8 +47,6 @@ public class MatrixClassProject extends PApplet{
 		NewLaunchpad = new Launchpad(this,"/PitchAndVelocity");
 		//NewLaunchpad_2 = new Launchpad(this,"/PitchAndVelocity_Pad2");
 		
-		
-		
 		NewConfig = new ConfigTable();
 		NewConfig.initialize("JSON_File");
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
@@ -57,7 +55,6 @@ public class MatrixClassProject extends PApplet{
 	public void draw()     
 	{
 		NewLaunchpad.display();
-		
 
 		for (int i = 0; i < NewConfig.StationList.size(); i ++)
 		{
@@ -141,6 +138,7 @@ public class MatrixClassProject extends PApplet{
 		}
 		*/
 	}
+	
 	public void mousePressed() 
 	{
 //		OscMessage myMessage = new OscMessage("/Velocity1");
