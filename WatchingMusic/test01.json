@@ -1,0 +1,37 @@
+{
+  "ProjectName": "Light Project Test",
+  "FileVersion": "00.00.01",
+  "Timestamp": "1550044082000",
+  "MyStations": [
+    {
+      "StationID": 0,
+      "Name": "Led 54 Par Light",
+      "IP": "10.1.1.12",
+      "Port": 2346,
+      "Titles":"Input:[Note,Tag],OutputParam:[BeginChannel,MaxChannel,Red,Green,Blue]",
+	  "Rules": [
+        {"Input":[112,0],"OutputType":"DMX","OutputParam":[1,8,1,2,3]},
+        {"Input":[113,1],"OutputType":"DMX","OutputParam":[9,8,1,2,3]}, 
+        {"Input":[114,2],"OutputType":"DMX","OutputParam":[17,8,1,2,3]},   
+        {"Input":[115,3],"OutputType":"DMX","OutputParam":[25,8,1,2,3]}
+      ]
+    },
+    {
+      "StationID": 1,
+      "Name": "Led Matrix pad",
+      "IP": "10.1.1.6",
+      "Port": 2346,
+      "Titles":"Input:[Note,Tag],OutputParam:[Begin,End]",
+	  "Rules": [
+        {"Input":[36,0],"OutputType":"WS281X","OutputParam":[0,1]},
+        {"Input":[37,1],"OutputType":"WS281X","OutputParam":[1,2]}, 
+        {"Input":[38,2],"OutputType":"WS281X","OutputParam":[2,3]},   
+        {"Input":[39,3],"OutputType":"WS281X","OutputParam":[3,4]},
+        {"Input":[68,4],"OutputType":"WS281X","OutputParam":[4,5]},
+        {"Input":[69,5],"OutputType":"WS281X","OutputParam":[5,6]}, 
+        {"Input":[70,6],"OutputType":"WS281X","OutputParam":[6,7]},   
+        {"Input":[71,7],"OutputType":"WS281X","OutputParam":[7,8]}
+      ]
+    }
+  ]
+}

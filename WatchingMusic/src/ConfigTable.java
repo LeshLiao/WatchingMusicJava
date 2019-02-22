@@ -1,12 +1,32 @@
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
+
+import ConfigJson.MyJsonConfig;
+
 
 public class ConfigTable 
 {
 	ArrayList<Station> StationList;
+	MyJsonConfig p;
 	
 	public ConfigTable() 
 	{
 		StationList = new ArrayList<Station>();
+		
+		System.out.println("11223");
+	}
+	
+	public boolean InitJson(String FileName) throws FileNotFoundException
+	{
+		JsonReader reader = new JsonReader(new FileReader(FileName));
+		Gson gson = new GsonBuilder().create();
+		p = gson.fromJson(reader, MyJsonConfig.class); 
+		return true;
 	}
 	
 	public boolean initialize(String FileName)
