@@ -7,25 +7,36 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import ConfigJson.MyJsonConfig;
+import ConfigJson.MyStation;
 
 
 public class ConfigTable 
 {
 	ArrayList<Station> StationList;
-	MyJsonConfig p;
+	MyJsonConfig _myJsonConfig;
 	
 	public ConfigTable() 
 	{
 		StationList = new ArrayList<Station>();
 		
-		System.out.println("11223");
+		//System.out.println("11223");
 	}
 	
-	public boolean InitJson(String FileName) throws FileNotFoundException
+	public boolean LoadJsonFile(String FileName) throws FileNotFoundException
 	{
 		JsonReader reader = new JsonReader(new FileReader(FileName));
 		Gson gson = new GsonBuilder().create();
-		p = gson.fromJson(reader, MyJsonConfig.class); 
+		this._myJsonConfig = gson.fromJson(reader, MyJsonConfig.class);
+		return true;
+	}
+	
+	public boolean initNetSettings()
+	{
+		for (int i = 0; i < this._myJsonConfig.getMyStations().size(); i++)
+		{
+			MyStation myStation = _myJsonConfig.getMyStations().get(i);
+			myStation.setNetSettings(myStation.getIP(),myStation.getPort());
+		}
 		return true;
 	}
 	

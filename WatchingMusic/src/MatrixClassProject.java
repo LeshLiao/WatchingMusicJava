@@ -3,6 +3,7 @@ import oscP5.*;
 
 import java.io.FileNotFoundException;
 
+import ConfigJson.MyStation;
 import netP5.*;
 
 
@@ -55,7 +56,8 @@ public class MatrixClassProject extends PApplet{
 		NewConfig.initialize("JSON_File");
 		
 		try {
-			NewConfig.InitJson("test01.json");
+			NewConfig.LoadJsonFile("test01.json");
+			NewConfig.initNetSettings();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,44 +70,61 @@ public class MatrixClassProject extends PApplet{
 	{
 		NewLaunchpad.display();
 
-		for (int i = 0; i < NewConfig.StationList.size(); i ++)
+//		for (int i = 0; i < NewConfig.StationList.size(); i ++)
+//		{
+//			Station TempStation = NewConfig.StationList.get(i);
+//			TempStation.IsSendData = false;		
+//	
+//			myMatrixMessage.clearArguments();
+//			String tempStr = "";
+//
+//			for (int j = 0; j < TempStation.SettingList.size(); j ++)
+//			{
+//				SettingRule setting = TempStation.SettingList.get(j);
+//				
+//				Particle P1 = NewLaunchpad.MainMatrix.get(setting.Note);
+//				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
+//			}
+//			
+//			if(TempStation.LastOneStr.equals(tempStr))
+//			{
+//				TempStation.IsSendData = false;
+//			}
+//			else
+//			{
+//				TempStation.IsSendData = true;
+//			}
+//			
+//			TempStation.LastOneStr = tempStr;
+//			myMatrixMessage.add(tempStr);
+//
+//			if(TempStation.IsSendData == true) 
+//			{
+//				oscP5.send(myMatrixMessage, TempStation.NetSettings);
+//			}
+//		}
+		
+		for (int i = 0; i < NewConfig._myJsonConfig.getMyStations().size(); i++)
 		{
-			Station TempStation = NewConfig.StationList.get(i);
-			TempStation.IsSendData = false;		
-	
-			myMatrixMessage.clearArguments();
+			MyStation myStation = NewConfig._myJsonConfig.getMyStations().get(i);
 			String tempStr = "";
 
-			for (int j = 0; j < TempStation.SettingList.size(); j ++)
+			for (int j = 0; j < myStation.getRules().size(); j++)
 			{
-				SettingRule setting = TempStation.SettingList.get(j);
-				
-				Particle P1 = NewLaunchpad.MainMatrix.get(setting.Note);
+				int Note = myStation.getRules().get(j).getInput();
+				Particle P1 = NewLaunchpad.MainMatrix.get(Note);
 				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
 			}
 			
-			if(TempStation.LastOneStr.equals(tempStr))
+			if(tempStr.equals(myStation.getLastTempString()) == false)
 			{
-				TempStation.IsSendData = false;
-			}
-			else
-			{
-				TempStation.IsSendData = true;
+				myMatrixMessage.clearArguments();
+				myMatrixMessage.add(tempStr);
+				oscP5.send(myMatrixMessage, myStation.getNetSettings());
+				System.out.println(tempStr);
 			}
 			
-			TempStation.LastOneStr = tempStr;
-			myMatrixMessage.add(tempStr);
-
-			if(TempStation.IsSendData == true) 
-			{
-				oscP5.send(myMatrixMessage, TempStation.NetSettings);
-			}
-		}
-		
-		for (int i = 0; i < NewConfig.p.getMyStations().size(); i++)
-		{
-			
-			
+			myStation.setLastTempString(tempStr);
 		}
 
 	}

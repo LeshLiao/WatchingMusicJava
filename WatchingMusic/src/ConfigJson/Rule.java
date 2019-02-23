@@ -5,9 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Rule {
+	@SerializedName("Tag")
+	@Expose
+	private Integer tag;
 	@SerializedName("Input")
 	@Expose
-	private List<Integer> input = null;
+	private Integer input;
 	@SerializedName("OutputType")
 	@Expose
 	private String outputType;
@@ -15,11 +18,19 @@ public class Rule {
 	@Expose
 	private List<Integer> outputParam = null;
 
-	public List<Integer> getInput() {
+	public Integer getTag() {
+	return tag;
+	}
+
+	public void setTag(Integer tag) {
+	this.tag = tag;
+	}
+
+	public Integer getInput() {
 	return input;
 	}
 
-	public void setInput(List<Integer> input) {
+	public void setInput(Integer input) {
 	this.input = input;
 	}
 

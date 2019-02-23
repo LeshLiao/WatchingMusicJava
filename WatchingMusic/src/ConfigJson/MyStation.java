@@ -4,6 +4,8 @@ import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import netP5.NetAddress;
+
 public class MyStation {
 
 	@SerializedName("StationID")
@@ -25,6 +27,10 @@ public class MyStation {
 	@Expose
 	private List<Rule> rules = null;
 
+	//Write by myself
+	private String LastTempString;
+	private NetAddress NetSettings;
+	
 	public Integer getStationID() {
 	return stationID;
 	}
@@ -72,4 +78,22 @@ public class MyStation {
 	public void setRules(List<Rule> rules) {
 	this.rules = rules;
 	}
+	
+	//Write by myself
+	public String getLastTempString() {
+	return LastTempString;
+	}
+	
+	public void setLastTempString(String _LastTempString) {
+	this.LastTempString = _LastTempString;
+	}
+	
+	public NetAddress getNetSettings() {
+	return NetSettings;
+	}
+	
+	public void setNetSettings(String _IP,int _Port) {
+	this.NetSettings = new NetAddress(_IP,_Port);
+	}
+
 }
