@@ -2,8 +2,8 @@ import processing.core.PApplet;
 import oscP5.*;
 
 import java.io.FileNotFoundException;
-
 import ConfigJson.MyStation;
+import UserInterface.ControlPanel;
 import netP5.*;
 
 
@@ -32,8 +32,13 @@ public class MatrixClassProject extends PApplet{
 	public void settings() 
 	{
 		size(300,300);
+		
 		//fullScreen(1);
 		//fullScreen(2);
+		
+		ControlPanel newPanel = new ControlPanel(); 
+		
+
 	}
 
 	public void setup() 
@@ -47,7 +52,7 @@ public class MatrixClassProject extends PApplet{
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
 		AbletonliveLocation = new NetAddress("127.0.0.1",8000);
-		TestLocation = new NetAddress("10.1.1.2",7700);
+		TestLocation = new NetAddress("172.20.10.13",2346);
 		
 		NewLaunchpad = new Launchpad(this,"/PitchAndVelocity");
 		//NewLaunchpad_2 = new Launchpad(this,"/PitchAndVelocity_Pad2");
@@ -131,6 +136,7 @@ public class MatrixClassProject extends PApplet{
 	
 	void oscEvent(OscMessage theOscMessage) 
 	{
+		
 		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
 		if(temp_Addr.equals("/PitchAndVelocity"))
 		{
@@ -138,6 +144,8 @@ public class MatrixClassProject extends PApplet{
 			tempVelocity = theOscMessage.get(1).intValue(); 
 			NewLaunchpad.update(tempNote,tempVelocity);	
 		}
+		
+//		System.out.println(theOscMessage.addrPattern());
 		
 		
 		/*
@@ -188,19 +196,19 @@ public class MatrixClassProject extends PApplet{
 //		oscP5.send(myMessage2, myRemoteLocation); 
 		
 		
-		OscMessage myMessage = new OscMessage("/TagAndVelocity");
+		OscMessage myMessage = new OscMessage("/Instruction");
 		//int ValueRan = (int) (random(100));
 		//float TestValue = 0.005f;
-		myMessage.add(255); 
-		myMessage.add(0); 
-		myMessage.add(0); 
-		myMessage.add(255); 
-		myMessage.add(0); 
-		myMessage.add(0); 
-		myMessage.add(0); 
-		myMessage.add(0); 
-		myMessage.add(0); 
-		myMessage.add(0); 
+		myMessage.add(32); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
+		//myMessage.add(255); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
+		//myMessage.add(0); 
 		
 		oscP5.send(myMessage, TestLocation); 
 		
@@ -227,6 +235,10 @@ public class MatrixClassProject extends PApplet{
 		//  println(lines[i]);
 		//}
 		
+
 	}
+	
+
+	 
 
 }
