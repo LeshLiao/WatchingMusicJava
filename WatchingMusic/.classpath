@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="ProcessingLib/oscP5.jar"/>
 	<classpathentry kind="lib" path="ProcessingLib/xbee-java-library-1.2.1.jar"/>
 	<classpathentry kind="lib" path="ProcessingLib/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jsch-0.1.55.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

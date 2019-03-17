@@ -6,8 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
-import ConfigJson.MyJsonConfig;
-import ConfigJson.MyStation;
+import Config.MyJsonConfig;
+import Config.MyStation;
 
 
 public class ConfigTable 

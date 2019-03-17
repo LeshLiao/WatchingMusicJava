@@ -2,7 +2,8 @@ import processing.core.PApplet;
 import oscP5.*;
 
 import java.io.FileNotFoundException;
-import ConfigJson.MyStation;
+
+import Config.MyStation;
 import UserInterface.ControlPanel;
 import netP5.*;
 
@@ -28,7 +29,7 @@ public class MatrixClassProject extends PApplet{
 	public static void main(String[] args) {
 		PApplet.main("MatrixClassProject");
 	}
-	
+
 	public void settings() 
 	{
 		size(300,300);
@@ -61,7 +62,7 @@ public class MatrixClassProject extends PApplet{
 		NewConfig.initialize("JSON_File");
 		
 		try {
-			NewConfig.LoadJsonFile("test01.json");
+			NewConfig.LoadJsonFile("StationSetup.json");
 			NewConfig.initNetSettings();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -69,6 +70,9 @@ public class MatrixClassProject extends PApplet{
 		}
 		
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
+		
+		
+
 	}
 
 	public void draw()     
@@ -126,7 +130,7 @@ public class MatrixClassProject extends PApplet{
 				myMatrixMessage.clearArguments();
 				myMatrixMessage.add(tempStr);
 				oscP5.send(myMatrixMessage, myStation.getNetSettings());
-				System.out.println(tempStr);
+				//System.out.println(tempStr);
 			}
 			
 			myStation.setLastTempString(tempStr);
