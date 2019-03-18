@@ -4,6 +4,7 @@ import oscP5.*;
 import java.io.FileNotFoundException;
 
 import Config.MyStation;
+import Data.ConfigTable;
 import UserInterface.ControlPanel;
 import netP5.*;
 
@@ -37,7 +38,7 @@ public class MatrixClassProject extends PApplet{
 		//fullScreen(1);
 		//fullScreen(2);
 		
-		ControlPanel newPanel = new ControlPanel(); 
+		
 		
 
 	}
@@ -59,11 +60,12 @@ public class MatrixClassProject extends PApplet{
 		//NewLaunchpad_2 = new Launchpad(this,"/PitchAndVelocity_Pad2");
 		
 		NewConfig = new ConfigTable();
-		NewConfig.initialize("JSON_File");
+		//NewConfig.initialize("JSON_File");
 		
 		try {
 			NewConfig.LoadJsonFile("StationSetup.json");
 			NewConfig.initNetSettings();
+			System.out.println("Json TimeStamp:"+NewConfig.getTimeStamp());
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,7 +73,7 @@ public class MatrixClassProject extends PApplet{
 		
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
-		
+		ControlPanel newPanel = new ControlPanel(NewConfig); 
 
 	}
 

@@ -18,7 +18,7 @@ public class SyncFile {
 		host = _host;
 		int port=22;
 		
-		String remoteFile="sample.txt";
+		//String remoteFile="sample.txt";
 		    
 		JSch jsch = new JSch();
 		

@@ -1,3 +1,5 @@
+package Data;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -12,12 +14,14 @@ import Config.MyStation;
 
 public class ConfigTable 
 {
-	ArrayList<Station> StationList;
-	MyJsonConfig _myJsonConfig;
+	//ArrayList<Station> StationList;
+	private String TimeStamp;
+	public MyJsonConfig _myJsonConfig;
+	
 	
 	public ConfigTable() 
 	{
-		StationList = new ArrayList<Station>();
+		//StationList = new ArrayList<Station>();
 		
 		//System.out.println("11223");
 	}
@@ -27,6 +31,7 @@ public class ConfigTable
 		JsonReader reader = new JsonReader(new FileReader(FileName));
 		Gson gson = new GsonBuilder().create();
 		this._myJsonConfig = gson.fromJson(reader, MyJsonConfig.class);
+		TimeStamp = this._myJsonConfig.getTimestamp();
 		return true;
 	}
 	
@@ -40,8 +45,14 @@ public class ConfigTable
 		return true;
 	}
 	
+	public String getTimeStamp()
+	{
+		return TimeStamp;
+	}
+	
 	public boolean initialize(String FileName)
 	{
+		/*
 		Station TempStation;
 		
 		StationList.add(new Station("Led 54 Par Light","10.1.1.12",2346));
@@ -138,8 +149,9 @@ public class ConfigTable
 		TempStation.SettingList.add(new SettingRule(true,66,0,61));
 		TempStation.SettingList.add(new SettingRule(true,65,0,62));
 		TempStation.SettingList.add(new SettingRule(true,64,0,63));
-	
+		*/
 		return true;
+		
 	}
 
 }

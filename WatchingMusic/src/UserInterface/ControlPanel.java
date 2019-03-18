@@ -7,6 +7,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
 import Communication.SyncFile;
+import Data.ConfigTable;
 import netP5.NetAddress;
 import netP5.NetAddressList;
 import oscP5.OscEventListener;
@@ -16,6 +17,7 @@ import oscP5.OscStatus;
 
 import java.awt.*; 
 import java.awt.event.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -34,15 +36,17 @@ public class ControlPanel extends JFrame
 	InetAddress inetAddress;
 	String _myHostAddress;
 	int _myHostport;
+	ConfigTable NewConfig;
 	
 	
-	public ControlPanel() 
+	public ControlPanel(ConfigTable _newConfig) 
     { 
 		super("Watching Music Control Panel"); 
 		setSize(600,300); 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); 
 		setVisible(true); 
 		
+		NewConfig = _newConfig;
 		
 		
 		try {
@@ -112,8 +116,12 @@ public class ControlPanel extends JFrame
 			{ 
 				SyncFile newSyncFile;
 				System.out.println("Button Event: SYNC_JSON");
-				
+
 				try {
+					System.out.println("Reload:StationSetup.json");
+					NewConfig.LoadJsonFile("StationSetup.json");
+					NewConfig.initNetSettings();
+					System.out.println("Json TimeStamp:"+NewConfig.getTimeStamp());
 					
 					for (int i=0; i<availableAddressList.size(); i++) 
 					{
@@ -122,9 +130,16 @@ public class ControlPanel extends JFrame
 						newSyncFile = new SyncFile("pi","raspberry",availableAddressList.get(i).address());
 						newSyncFile.putFile("StationSetup.json", "rpi-ws281x-python-and-osc/examples/config/StationSetup.json");
 						newSyncFile.Close();
+						
+						OscMessage myMessage = new OscMessage("/Instruction");
+						myMessage.add("RELOAD_JSON");
+						myMessage.add("0"); 
+						myMessage.add("0"); 
+						
+						oscP5.send(myMessage, availableAddressList.get(i));
 					}
 					
-				} catch (JSchException | SftpException e1) {
+				} catch (JSchException | SftpException | FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}

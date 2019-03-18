@@ -20,7 +20,7 @@
     {
       "StationID": 1,
       "Name": "Led Matrix pad",
-      "IP": "192.168.0.10",
+      "IP": "172.20.10.13",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],OutputParam:[Begin,End]",
 	  "Rules": [
