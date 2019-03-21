@@ -6,6 +6,7 @@ import javax.swing.*;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
+import Communication.RemoteControl;
 import Communication.SyncFile;
 import Data.ConfigTable;
 import netP5.NetAddress;
@@ -37,6 +38,7 @@ public class ControlPanel extends JFrame
 	String _myHostAddress;
 	int _myHostport;
 	ConfigTable NewConfig;
+	RemoteControl newRemoteControl;
 	
 	
 	public ControlPanel(ConfigTable _newConfig) 
@@ -73,6 +75,15 @@ public class ControlPanel extends JFrame
 		
 		JButton bt4 = new JButton("Breathing light"); 
 		pn.add(bt4);
+		
+		JButton bt5 = new JButton("Run all OSC service"); 
+		pn.add(bt5);
+		
+		JButton bt6 = new JButton("Stop all OSC service"); 
+		pn.add(bt6);
+		
+		JButton bt7 = new JButton("Pull latest version"); 
+		pn.add(bt7);
 		
 		setContentPane(pn); 
 		
@@ -161,6 +172,69 @@ public class ControlPanel extends JFrame
 				System.out.println("Button Event: BREATHING_LIGHT");
 			} 
 		}); 
+		
+		bt5.addActionListener(new ActionListener()
+		{ 
+			public void actionPerformed(ActionEvent e) 
+			{                                            
+				for (int i=0; i<reachableAddressList.size(); i++) 
+				{
+		            System.out.println("send commend to:"+reachableAddressList.get(i).address());
+				
+		            try {
+						newRemoteControl = new RemoteControl("pi","raspberry",reachableAddressList.get(i).address());
+						newRemoteControl.sendCommend("sudo python3 rpi-ws281x-python-and-osc/examples/osc_server.py");
+			            newRemoteControl.Close();
+		            } catch (JSchException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				System.out.println("Button Event: RUN_OSC");
+			} 
+		});
+		
+		bt6.addActionListener(new ActionListener()
+		{ 
+			public void actionPerformed(ActionEvent e) 
+			{                                            
+				for (int i=0; i<reachableAddressList.size(); i++) 
+				{
+		            System.out.println("send commend to:"+reachableAddressList.get(i).address());
+				
+		            try {
+						newRemoteControl = new RemoteControl("pi","raspberry",reachableAddressList.get(i).address());
+			            newRemoteControl.sendCommend("sudo pkill -9 python");
+			            newRemoteControl.Close();
+		            } catch (JSchException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				System.out.println("Button Event: STOP_OSC");
+			} 
+		});
+		
+		bt7.addActionListener(new ActionListener()
+		{ 
+			public void actionPerformed(ActionEvent e) 
+			{                                            
+				for (int i=0; i<reachableAddressList.size(); i++) 
+				{
+		            System.out.println("send commend to:"+reachableAddressList.get(i).address());
+				
+		            try {
+						newRemoteControl = new RemoteControl("pi","raspberry",reachableAddressList.get(i).address());
+						newRemoteControl.sendCommend("sudo sh rpi-ws281x-python-and-osc/git_pull_script.sh");
+			            //newRemoteControl.Close();   // close so fast, so we comment it.
+		            } catch (JSchException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				System.out.println("Button Event: GIT_PULL");
+			} 
+		});
 		
 		oscP5.addListener(new OscEventListener()
 		{
