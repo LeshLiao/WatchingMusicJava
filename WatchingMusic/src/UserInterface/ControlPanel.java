@@ -44,7 +44,7 @@ public class ControlPanel extends JFrame
 	public ControlPanel(ConfigTable _newConfig) 
     { 
 		super("Watching Music Control Panel"); 
-		setSize(600,300); 
+		setSize(240,500); 
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); 
 		setVisible(true); 
 		
@@ -61,6 +61,8 @@ public class ControlPanel extends JFrame
 		oscP5 = new OscP5(this, _myHostport);
 			
 		Container pn = getContentPane(); 
+		pn.setBackground(new Color(0,0,0));
+		
 		FlowLayout fy = new FlowLayout();
 		pn.setLayout(fy); 
 
@@ -247,9 +249,14 @@ public class ControlPanel extends JFrame
 				if(arg0.addrPattern().equals("/Response"))
 				{
 					AddToAvailableAddressList(arg0.get(0).stringValue(),arg0.get(1).intValue());
-					//System.out.println("1):"+arg0.get(0).stringValue());
+					
+					System.out.print("IP:"+arg0.get(0).stringValue());
+					System.out.println(", GIT SHA:"+arg0.get(2).stringValue().substring(0, 7));
 					//System.out.println("2):"+Integer.toString(arg0.get(1).intValue()));
+					
 				}
+				System.out.println("### currently there are "+availableAddressList.list().size()+" available OSC device.");
+			
 				
 			}
 
@@ -277,6 +284,7 @@ public class ControlPanel extends JFrame
 	{
 
 		int timeout=50;
+		int OSC_port = 2346;
 		for (int i=1;i<15;i++)
 		{
 			String host=subnet + "." + i;
@@ -286,7 +294,19 @@ public class ControlPanel extends JFrame
 		
 			if (InetAddress.getByName(host).isReachable(timeout))
 			{
-				AddToReachableAddressList(host,2346);
+	            try 
+	            {
+					newRemoteControl = new RemoteControl("pi","raspberry",host);
+		            //newRemoteControl.Close();   // close so fast, so we comment it.
+		            AddToReachableAddressList(host,OSC_port);
+	            } catch (JSchException e1) {
+					// TODO Auto-generated catch block
+	            	//e1.
+	            	
+	            	
+	            	System.out.println(host+":"+e1.getMessage());
+					//e1.printStackTrace();
+				}
 			}
 		}
 		System.out.println("### currently there are "+reachableAddressList.list().size()+" reachable locations.");
@@ -317,7 +337,6 @@ public class ControlPanel extends JFrame
 		{
 			System.out.println("### "+theIPaddress+" has already existed.");
 		}
-		System.out.println("### currently there are "+availableAddressList.list().size()+" available OSC device.");
+		
 	}
-
 }

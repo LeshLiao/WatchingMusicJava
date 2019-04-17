@@ -202,10 +202,10 @@ public class MatrixClassProject extends PApplet{
 //		oscP5.send(myMessage2, myRemoteLocation); 
 		
 		
-		OscMessage myMessage = new OscMessage("/Instruction");
+		//OscMessage myMessage = new OscMessage("/Instruction");
 		//int ValueRan = (int) (random(100));
 		//float TestValue = 0.005f;
-		myMessage.add(32); 
+		//myMessage.add(32); 
 		//myMessage.add(0); 
 		//myMessage.add(0); 
 		//myMessage.add(255); 
@@ -216,7 +216,7 @@ public class MatrixClassProject extends PApplet{
 		//myMessage.add(0); 
 		//myMessage.add(0); 
 		
-		oscP5.send(myMessage, TestLocation); 
+		//oscP5.send(myMessage, TestLocation); 
 		
 		
 		/*

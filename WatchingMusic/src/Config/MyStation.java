@@ -23,6 +23,9 @@ public class MyStation {
 	@SerializedName("Titles")
 	@Expose
 	private String titles;
+	@SerializedName("Devices")
+	@Expose
+	private List<Device> devices = null;
 	@SerializedName("Rules")
 	@Expose
 	private List<Rule> rules = null;
@@ -69,6 +72,14 @@ public class MyStation {
 
 	public void setTitles(String titles) {
 	this.titles = titles;
+	}
+
+	public List<Device> getDevices() {
+	return devices;
+	}
+
+	public void setDevices(List<Device> devices) {
+	this.devices = devices;
 	}
 
 	public List<Rule> getRules() {
