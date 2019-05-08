@@ -2,27 +2,21 @@ import processing.core.PApplet;
 import oscP5.*;
 
 import java.io.FileNotFoundException;
-
 import Config.MyStation;
 import Data.ConfigTable;
-import UserInterface.ControlPanel;
+import UserInterface.*;
 import netP5.*;
-
-
 
 public class MatrixClassProject extends PApplet{
 	OscP5 oscP5;
 	NetAddress myRemoteLocation;
 	NetAddress AbletonliveLocation;
 	NetAddress TestLocation;
-	
 	Launchpad NewLaunchpad;
 	Launchpad NewLaunchpad_2;
-	
 	OscMessage myMatrixMessage;
 	ConfigTable NewConfig;
-	
-	
+
 	int tempVelocity = 0;
 	int tempNote = 0;
 	Stripe[] stripes = new Stripe[50];
@@ -34,13 +28,8 @@ public class MatrixClassProject extends PApplet{
 	public void settings() 
 	{
 		size(300,300);
-		
 		//fullScreen(1);
 		//fullScreen(2);
-		
-		
-		
-
 	}
 
 	public void setup() 
@@ -48,7 +37,6 @@ public class MatrixClassProject extends PApplet{
 		background(50);
 		surface.setResizable(true);
 		noStroke(); // no border line
-		//smooth();
 		frameRate(60);	// 60Hz
 		
 		oscP5 = new OscP5(this,2346);
@@ -73,60 +61,26 @@ public class MatrixClassProject extends PApplet{
 		
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
-		ControlPanel newPanel = new ControlPanel(NewConfig); 
-
+		ControlPanel newPanel2 = new ControlPanel(NewConfig); 
+		newPanel2.setVisible(true);
+		
+		frame.setVisible(false);
 	}
 
 	public void draw()     
 	{
 		NewLaunchpad.display();
-
-//		for (int i = 0; i < NewConfig.StationList.size(); i ++)
-//		{
-//			Station TempStation = NewConfig.StationList.get(i);
-//			TempStation.IsSendData = false;		
-//	
-//			myMatrixMessage.clearArguments();
-//			String tempStr = "";
-//
-//			for (int j = 0; j < TempStation.SettingList.size(); j ++)
-//			{
-//				SettingRule setting = TempStation.SettingList.get(j);
-//				
-//				Particle P1 = NewLaunchpad.MainMatrix.get(setting.Note);
-//				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
-//			}
-//			
-//			if(TempStation.LastOneStr.equals(tempStr))
-//			{
-//				TempStation.IsSendData = false;
-//			}
-//			else
-//			{
-//				TempStation.IsSendData = true;
-//			}
-//			
-//			TempStation.LastOneStr = tempStr;
-//			myMatrixMessage.add(tempStr);
-//
-//			if(TempStation.IsSendData == true) 
-//			{
-//				oscP5.send(myMatrixMessage, TempStation.NetSettings);
-//			}
-//		}
 		
 		for (int i = 0; i < NewConfig._myJsonConfig.getMyStations().size(); i++)
 		{
 			MyStation myStation = NewConfig._myJsonConfig.getMyStations().get(i);
 			String tempStr = "";
-
 			for (int j = 0; j < myStation.getRules().size(); j++)
 			{
 				int Note = myStation.getRules().get(j).getInput();
 				Particle P1 = NewLaunchpad.MainMatrix.get(Note);
 				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
 			}
-			
 			if(tempStr.equals(myStation.getLastTempString()) == false)
 			{
 				myMatrixMessage.clearArguments();
@@ -134,7 +88,6 @@ public class MatrixClassProject extends PApplet{
 				oscP5.send(myMatrixMessage, myStation.getNetSettings());
 				//System.out.println(tempStr);
 			}
-			
 			myStation.setLastTempString(tempStr);
 		}
 
@@ -240,11 +193,5 @@ public class MatrixClassProject extends PApplet{
 		//for (int i = 0 ; i < lines.length; i++) {
 		//  println(lines[i]);
 		//}
-		
-
 	}
-	
-
-	 
-
 }
