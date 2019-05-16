@@ -21,7 +21,7 @@ public class StatusTable extends JTable{
 		String [][] td = {{"<No Device>","","","",""}};
 		//String [][] td = {{"192.168.0.11","","","",""},{"192.168.0.22","","","",""},{"192.168.0.33","","","",""}};
 		tmpTableData = td;
-        BookField = new String[]{"IP","Port","Git version","Json file","OSC server"};
+        BookField = new String[]{"IP","Port","Git SHA","Json Timestamp","OSC server"};
         tmodel = new DefaultTableModel(tmpTableData,BookField); //建立表格
         this.setModel(tmodel);
         listOfLists = new ArrayList<List<String>>();
@@ -35,6 +35,20 @@ public class StatusTable extends JTable{
 		//Remove rows one by one from the end of the table
 		for (int i = rowCount - 1; i >= 0; i--) {
 			tmodel.removeRow(i);
+		}
+		return true;
+	}
+	
+	public boolean ClearTableStatus()
+	{
+		availableAddressList.list().clear();
+		
+		int rowCount = tmodel.getRowCount();
+		//Remove rows one by one from the end of the table
+		for (int i = rowCount - 1; i >= 0; i--) {
+			tmodel.setValueAt("", i, 2);
+			tmodel.setValueAt("", i, 3);
+			tmodel.setValueAt("", i, 4);
 		}
 		return true;
 	}
@@ -63,8 +77,9 @@ public class StatusTable extends JTable{
 	{
 		if (!availableAddressList.contains(theIPaddress, port)) 
 		{
+			int index = getIndexByAddress(theIPaddress);
 			availableAddressList.add(new NetAddress(theIPaddress, port));
-			tmodel.setValueAt("True", getIndexByAddress(theIPaddress), 4);
+			if(index >= 0)	tmodel.setValueAt("Serving", index, 4);
 			System.out.println("### adding "+theIPaddress+" to the available AddressList.");
 		} 
 		else 
@@ -75,12 +90,23 @@ public class StatusTable extends JTable{
 	
 	public void UpdateGitHash(String theIPaddress,String GitSha) 
 	{
-		tmodel.setValueAt(GitSha, getIndexByAddress(theIPaddress), 2);
+		
+		int index = getIndexByAddress(theIPaddress);
+		//System.out.println("UpdateGitHash:"+theIPaddress+",GitSha:"+GitSha+",index="+Integer.toString(index));
+		if(index >= 0)	tmodel.setValueAt(GitSha,index , 2);
+	}
+	
+	public void UpdateJsonTimestamp(String theIPaddress,String JsonTimestamp) 
+	{
+		
+		int index = getIndexByAddress(theIPaddress);
+		//System.out.println("UpdateJsonTimestamp:"+theIPaddress+",GitSha:"+JsonTimestamp+",index="+Integer.toString(index));
+		if(index >= 0)	tmodel.setValueAt(JsonTimestamp,index , 3);
 	}
 	
 	private int getIndexByAddress(String theIPaddress) 
 	{
-		int IpIndex = 0;
+		int IpIndex = -1;
 		for(int i = 0;i < reachableAddressList.size() ;i++)
 		{
 			if(theIPaddress.equals(reachableAddressList.get(i).address()))

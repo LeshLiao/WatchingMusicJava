@@ -51,6 +51,8 @@ public class ControlPanel extends JFrame {
 	private JTextField textField_port;
 	private JTextField textField_ipRange;
 	private JTextField textField_timeout;
+	private JTextField textField_ipBegin;
+	private JTextField txtSudoChmodr;
 	/**
 	 * Create the frame.
 	 */
@@ -66,7 +68,7 @@ public class ControlPanel extends JFrame {
 		
 		setBackground(Color.DARK_GRAY);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 833, 645);
+		setBounds(100, 100, 826, 708);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -74,7 +76,7 @@ public class ControlPanel extends JFrame {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel.setBounds(27, 64, 759, 133);
+		panel.setBounds(27, 62, 759, 133);
 		contentPane.add(panel);
 		panel.setLayout(null);
 		
@@ -83,15 +85,15 @@ public class ControlPanel extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				String subnet = textField_Subnet.getText();
 				int port = Integer.parseInt(textField_port.getText());
-				int ipRange = Integer.parseInt(textField_ipRange.getText());
+				int ipBegin = Integer.parseInt(textField_ipBegin.getText());
+				int ipEnd = Integer.parseInt(textField_ipRange.getText());
 				int timeout = Integer.parseInt(textField_timeout.getText());
 				
 				Stable.ClearTable();
 				System.out.println("Button Event: Scan subnet:"+subnet);
-				
-				;
+
 				try {
-					checkHosts(subnet,timeout,port,ipRange);
+					checkHosts(subnet,timeout,port,ipBegin,ipEnd);
 				} catch (IOException ex) {
 					// TODO Auto-generated catch block
 					ex.printStackTrace();
@@ -111,7 +113,7 @@ public class ControlPanel extends JFrame {
 				for (int i=0; i<Stable.reachableAddressList.size(); i++) 
 				{
 		            System.out.println("send commend to:"+Stable.reachableAddressList.get(i).address());
-				
+		            Stable.ClearTableStatus();
 		            try {
 						newRemoteControl = new RemoteControl("pi","raspberry",Stable.reachableAddressList.get(i).address());
 			            newRemoteControl.sendCommend("sudo pkill -9 python");
@@ -136,7 +138,9 @@ public class ControlPanel extends JFrame {
 				
 		            try {
 						newRemoteControl = new RemoteControl("pi","raspberry",Stable.reachableAddressList.get(i).address());
-						newRemoteControl.sendCommend("sudo python3 rpi-ws281x-python-and-osc/examples/osc_server.py");
+						String CommentStr = "sudo python3 rpi-ws281x-python-and-osc/examples/osc_server.py --ip " + _myHostAddress +" --port "+ Integer.toString(_myHostport);
+						//sudo python3 rpi-ws281x-python-and-osc/examples/osc_server.py --ip 192.168.1.2 --port 2349
+						newRemoteControl.sendCommend(CommentStr);
 			            newRemoteControl.Close();
 		            } catch (JSchException e1) {
 						// TODO Auto-generated catch block
@@ -149,10 +153,10 @@ public class ControlPanel extends JFrame {
 		btnRunAllService.setBounds(195, 93, 125, 27);
 		panel.add(btnRunAllService);
 		
-		JButton btnCheckOsc = new JButton("Check OSC Json Git");
+		JButton btnCheckOsc = new JButton("Update Device Info");
 		btnCheckOsc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Stable.availableAddressList.list().clear();
+				Stable.ClearTableStatus();
 				OscMessage myMessage = new OscMessage("/Instruction");
 				myMessage.add("CHECK_OSC");
 				myMessage.add(_myHostAddress); 
@@ -165,7 +169,7 @@ public class ControlPanel extends JFrame {
 		panel.add(btnCheckOsc);
 		
 		textField_Subnet = new JTextField();
-		textField_Subnet.setText("172.20.10");
+		textField_Subnet.setText("192.168.1");
 		textField_Subnet.setBounds(196, 54, 116, 25);
 		panel.add(textField_Subnet);
 		textField_Subnet.setColumns(10);
@@ -177,20 +181,26 @@ public class ControlPanel extends JFrame {
 		textField_port.setColumns(10);
 		
 		textField_ipRange = new JTextField();
-		textField_ipRange.setText("15");
-		textField_ipRange.setBounds(406, 54, 60, 25);
+		textField_ipRange.setText("105");
+		textField_ipRange.setBounds(482, 54, 60, 25);
 		panel.add(textField_ipRange);
 		textField_ipRange.setColumns(10);
 		
 		textField_timeout = new JTextField();
 		textField_timeout.setText("50");
-		textField_timeout.setBounds(482, 54, 60, 25);
+		textField_timeout.setBounds(556, 54, 60, 25);
 		panel.add(textField_timeout);
 		textField_timeout.setColumns(10);
 		
+		textField_ipBegin = new JTextField();
+		textField_ipBegin.setText("100");
+		textField_ipBegin.setColumns(10);
+		textField_ipBegin.setBounds(408, 54, 60, 25);
+		panel.add(textField_ipBegin);
+		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_2.setBounds(27, 419, 759, 166);
+		panel_2.setBounds(27, 482, 759, 166);
 		contentPane.add(panel_2);
 		panel_2.setLayout(null);
 		
@@ -204,7 +214,7 @@ public class ControlPanel extends JFrame {
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(null);
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_1.setBounds(27, 218, 759, 94);
+		panel_1.setBounds(27, 233, 759, 139);
 		contentPane.add(panel_1);
 		oscP5.addListener(new OscEventListener()
 		{
@@ -216,12 +226,20 @@ public class ControlPanel extends JFrame {
 				System.out.println("Control Panel oscEvent:"+arg0.addrPattern());
 				if(arg0.addrPattern().equals("/Response"))
 				{
+					
+					
 					Stable.AddToAvailableAddressList(arg0.get(0).stringValue(),arg0.get(1).intValue());
 					Stable.UpdateGitHash(arg0.get(0).stringValue(),arg0.get(2).stringValue().substring(0, 7));
 					System.out.print("IP:"+arg0.get(0).stringValue());
 					System.out.println(", GIT SHA:"+arg0.get(2).stringValue().substring(0, 7));
 					//System.out.println("2):"+Integer.toString(arg0.get(1).intValue()));
 					
+					//System.out.println("typetag:"+ arg0.typetag().length()); 
+					if(arg0.typetag().length() > 3)
+					{
+						//System.out.println("str:"+arg0.get(3).stringValue());
+						Stable.UpdateJsonTimestamp(arg0.get(0).stringValue(),arg0.get(3).stringValue());
+					}
 				}
 				System.out.println("### currently there are "+Stable.availableAddressList.list().size()+" available OSC device.");
 			}
@@ -276,19 +294,7 @@ public class ControlPanel extends JFrame {
 		JButton button_3 = new JButton("Pull latest version");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				for (int i=0; i<Stable.reachableAddressList.size(); i++) 
-				{
-		            System.out.println("send commend to:"+Stable.reachableAddressList.get(i).address());
-				
-		            try {
-						newRemoteControl = new RemoteControl("pi","raspberry",Stable.reachableAddressList.get(i).address());
-						newRemoteControl.sendCommend("sudo sh rpi-ws281x-python-and-osc/git_pull_script.sh");
-			            //newRemoteControl.Close();   // close so fast, so we comment it.
-		            } catch (JSchException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
+				SendCommendToAllDevice("sudo sh rpi-ws281x-python-and-osc/git_pull_script.sh");
 				System.out.println("Button Event: GIT_PULL");
 			}
 		});
@@ -310,10 +316,35 @@ public class ControlPanel extends JFrame {
 		button.setBounds(195, 13, 125, 27);
 		panel_1.add(button);
 		
+		JButton btnSendCommend = new JButton("Send Commend");
+		btnSendCommend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SendCommendToAllDevice(txtSudoChmodr.getText());
+				System.out.println("Button Event: Send_comment");
+			}
+		});
+		btnSendCommend.setBounds(14, 93, 153, 27);
+		panel_1.add(btnSendCommend);
+		
+		txtSudoChmodr = new JTextField();
+		txtSudoChmodr.setText("sudo chmod -R 777 rpi-ws281x-python-and-osc/ ");
+		txtSudoChmodr.setBounds(195, 94, 458, 25);
+		panel_1.add(txtSudoChmodr);
+		txtSudoChmodr.setColumns(10);
+		
+		JButton btnNewButton_Shutdown_all = new JButton("Shutdown all");
+		btnNewButton_Shutdown_all.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SendCommendToAllDevice("sudo halt");
+			}
+		});
+		btnNewButton_Shutdown_all.setBounds(337, 13, 125, 27);
+		panel_1.add(btnNewButton_Shutdown_all);
+		
 		JPanel panel_3 = new JPanel();
 		panel_3.setLayout(null);
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(27, 338, 759, 54);
+		panel_3.setBounds(27, 404, 759, 54);
 		contentPane.add(panel_3);
 		
 		JButton btnTest_1 = new JButton("test01");
@@ -357,9 +388,24 @@ public class ControlPanel extends JFrame {
 		_myHostport = 2349;
 	}
 	
-	public void checkHosts(String subnet,int _timeout,int _OscPort,int _IpRange) throws UnknownHostException, IOException
+	public void SendCommendToAllDevice(String _commend)
 	{
-		for (int i=1;i<_IpRange;i++)
+		for (int i=0; i<Stable.reachableAddressList.size(); i++) 
+		{
+            System.out.println("send commend to:"+Stable.reachableAddressList.get(i).address());
+            try {
+				newRemoteControl = new RemoteControl("pi","raspberry",Stable.reachableAddressList.get(i).address());
+				newRemoteControl.sendCommend(_commend);
+            } catch (JSchException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	public void checkHosts(String subnet,int _timeout,int _OscPort,int _beginIP,int _IpEnd) throws UnknownHostException, IOException
+	{
+		
+		for (int i=_beginIP;i<=_IpEnd;i++)
 		{
 			String host=subnet + "." + i;
 		
