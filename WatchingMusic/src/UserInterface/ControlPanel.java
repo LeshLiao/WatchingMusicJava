@@ -181,7 +181,7 @@ public class ControlPanel extends JFrame {
 		textField_port.setColumns(10);
 		
 		textField_ipRange = new JTextField();
-		textField_ipRange.setText("105");
+		textField_ipRange.setText("112");
 		textField_ipRange.setBounds(482, 54, 60, 25);
 		panel.add(textField_ipRange);
 		textField_ipRange.setColumns(10);
@@ -193,7 +193,7 @@ public class ControlPanel extends JFrame {
 		textField_timeout.setColumns(10);
 		
 		textField_ipBegin = new JTextField();
-		textField_ipBegin.setText("100");
+		textField_ipBegin.setText("99");
 		textField_ipBegin.setColumns(10);
 		textField_ipBegin.setBounds(408, 54, 60, 25);
 		panel.add(textField_ipBegin);
@@ -294,7 +294,8 @@ public class ControlPanel extends JFrame {
 		JButton button_3 = new JButton("Pull latest version");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SendCommendToAllDevice("sudo sh rpi-ws281x-python-and-osc/git_pull_script.sh");
+				//SendCommendToAllDevice("sudo sh rpi-ws281x-python-and-osc/git_pull_script.sh");
+				SendCommendToAllDevice("sh rpi-ws281x-python-and-osc/git_pull_script.sh");
 				System.out.println("Button Event: GIT_PULL");
 			}
 		});

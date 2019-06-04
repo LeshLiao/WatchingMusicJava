@@ -2,6 +2,8 @@ import processing.core.PApplet;
 import oscP5.*;
 
 import java.io.FileNotFoundException;
+import java.time.Instant;
+
 import Config.MyStation;
 import Data.ConfigTable;
 import UserInterface.*;
@@ -19,6 +21,8 @@ public class MatrixClassProject extends PApplet{
 
 	int tempVelocity = 0;
 	int tempNote = 0;
+	int test_count = 0; //testing
+	
 	Stripe[] stripes = new Stripe[50];
 	
 	public static void main(String[] args) {
@@ -64,12 +68,18 @@ public class MatrixClassProject extends PApplet{
 		ControlPanel newPanel2 = new ControlPanel(NewConfig); 
 		newPanel2.setVisible(true);
 		
-		frame.setVisible(false);
+		//frame.setVisible(false);
+		surface.setVisible(false); //Hide Main frame
 	}
 
 	public void draw()     
 	{
 		NewLaunchpad.display();
+		//test_count++;  //testing
+		//if(test_count >= 60)
+		//{
+		//	System.out.println("sta:"+Instant.now());
+		//}
 		
 		for (int i = 0; i < NewConfig._myJsonConfig.getMyStations().size(); i++)
 		{
@@ -86,10 +96,15 @@ public class MatrixClassProject extends PApplet{
 				myMatrixMessage.clearArguments();
 				myMatrixMessage.add(tempStr);
 				oscP5.send(myMatrixMessage, myStation.getNetSettings());
-				//System.out.println(tempStr);
 			}
 			myStation.setLastTempString(tempStr);
 		}
+		
+		//if(test_count >= 60) //testing
+		//{
+		//	System.out.println("End:"+Instant.now());
+		//	test_count = 0;
+		//}
 
 	}
 	
