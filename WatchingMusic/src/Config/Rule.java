@@ -8,6 +8,9 @@ public class Rule {
 	@SerializedName("Tag")
 	@Expose
 	private Integer tag;
+	@SerializedName("PadNo")
+	@Expose
+	private Integer padNo;
 	@SerializedName("Input")
 	@Expose
 	private Integer input;
@@ -26,6 +29,14 @@ public class Rule {
 	this.tag = tag;
 	}
 
+	public Integer getPadNo() {
+		return padNo;
+	}
+
+	public void setPadNo(Integer padNo) {
+		this.padNo = padNo;
+	}
+		
 	public Integer getInput() {
 	return input;
 	}

@@ -11,57 +11,59 @@ public class Launchpad
 	ColorMappingTable MyColor;
 	final static int MatrixHeight = 8;                
 	final static int MatrixWidth = 8;
-	final static int SlotSize = 100;
-	final static int SlotGapX = 145;
-	final static int SlotGapY = 40;
+	final static int SlotSize = 50;
+	final static int SlotGapX = 20;
+	final static int SlotGapY = 20;
+	int Edge_X;						
+	
 	PApplet parent; // The parent PApplet that we will render ourselves onto
 	OscMessage myMatrixMessage; 
-	
+	String PadName;
 	//ConfigTable MyTestconfigTable;
-	String OscAddress = "";
+
 	
-	Launchpad(PApplet _p,String _OscAddress)
+	Launchpad(PApplet _p,String _PadName,int _Edge_X)
 	{
 		parent = _p;
-		OscAddress = _OscAddress;
-				
+		PadName = _PadName;
+		Edge_X = _Edge_X;
+		
 		MyColor = new ColorMappingTable(); 
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
 		MainMatrix = new ArrayList<Particle>();   
 		for(int _note = 0;_note < 128; _note++)		//Launchpad has 128 notes 
-			MainMatrix.add(new Particle(parent));
-		
-		InitPosition_center();
-		
-		//Test
-		//MyTestconfigTable = new ConfigTable();
-		//MyTestconfigTable.initialize("JSON_File");
-	}
+			//MainMatrix.add(new Particle(parent));   		// here!!
+			MainMatrix.add(new FadedOutParticle(parent));   // Polymorphism
 
-	public void InitPosition_center()				// Initial note 36~99
+		InitParticlePosition();
+	}
+	
+	private void InitParticlePosition()
 	{
-		int Init_rectX = 0;
-		for(int BeginValue = 0;BeginValue < 64; BeginValue+=32)
+		int[][] NoteNumber = {{  0, 28, 29, 30, 31, 32, 33, 34, 35,  0},
+                			  {108, 64, 65, 66, 67, 96, 97, 98, 99,100},
+                			  {109, 60, 61, 62, 63, 92, 93, 94, 95,101},
+                			  {110, 56, 57, 58, 59, 88, 89, 90, 91,102},
+                			  {111, 52, 53, 54, 55, 84, 85, 86, 87,103},
+                			  {112, 48, 49, 50, 51, 80, 81, 82, 83,104},
+                			  {113, 44, 45, 46, 47, 76, 77, 78, 79,105},
+                			  {114, 40, 41, 42, 43, 72, 73, 74, 75,106},
+                			  {115, 36, 37, 38, 39, 68, 69, 70, 71,107},
+                			  {  0,116,117,118,119,120,121,122,123,  0}};
+		
+		int rectY = 0;
+		for(int i = 0;i < 10; i++)
 		{
-			int rectX = Init_rectX;
-			int rectY = MatrixHeight*SlotSize+(SlotGapY*MatrixHeight);
-			for(int i = BeginValue;i < 32+BeginValue; i++)
-			{
-				if(i % 4 == 0)
-				{
-					rectX = Init_rectX;
-					rectY = rectY - SlotSize - SlotGapY; 
-				}
-				else
-				{
-					rectX = rectX + SlotSize + SlotGapX;
-				}
-				Particle P1 = MainMatrix.get(i+36); 
-				P1.SetPosition(rectX,rectY,SlotSize);
-			} 
-			Init_rectX = (SlotSize*MatrixWidth/2)+(SlotGapX*(MatrixWidth/2));
-		}	
+			int rectX = 0;
+			for(int j = 0;j < 10; j++)
+			{	
+				Particle P1 = MainMatrix.get(NoteNumber[i][j]);
+				P1.SetPosition(rectX+Edge_X,rectY,SlotSize);
+				rectX = rectX + SlotSize + SlotGapX;
+			}
+			rectY = rectY + SlotSize + SlotGapY;
+		}
 	}
 
 	public void update(int Note,int Volicity)
@@ -83,7 +85,7 @@ public class Launchpad
 
 	public void display()
 	{
-		parent.background(0);
+		//parent.background(0);
 		for (int i = 0; i < MainMatrix.size(); i ++)
 		{
 			Particle P1 = MainMatrix.get(i);

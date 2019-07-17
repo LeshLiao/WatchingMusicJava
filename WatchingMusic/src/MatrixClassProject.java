@@ -3,6 +3,7 @@ import oscP5.*;
 
 import java.io.FileNotFoundException;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import Config.MyStation;
 import Data.ConfigTable;
@@ -14,16 +15,14 @@ public class MatrixClassProject extends PApplet{
 	NetAddress myRemoteLocation;
 	NetAddress AbletonliveLocation;
 	NetAddress TestLocation;
-	Launchpad NewLaunchpad;
-	Launchpad NewLaunchpad_2;
 	OscMessage myMatrixMessage;
 	ConfigTable NewConfig;
-
-	int tempVelocity = 0;
-	int tempNote = 0;
-	int test_count = 0; //testing
+	ArrayList<Launchpad> MidiDevice;
 	
-	Stripe[] stripes = new Stripe[50];
+	int _PadNumber = 0;
+	int _Velocity = 0;
+	int _Note = 0;
+	int test_count = 0; //testing
 	
 	public static void main(String[] args) {
 		PApplet.main("MatrixClassProject");
@@ -31,7 +30,7 @@ public class MatrixClassProject extends PApplet{
 
 	public void settings() 
 	{
-		size(300,300);
+		size(1600,800);
 		//fullScreen(1);
 		//fullScreen(2);
 	}
@@ -47,13 +46,8 @@ public class MatrixClassProject extends PApplet{
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
 		AbletonliveLocation = new NetAddress("127.0.0.1",8000);
 		TestLocation = new NetAddress("172.20.10.13",2346);
-		
-		NewLaunchpad = new Launchpad(this,"/PitchAndVelocity");
-		//NewLaunchpad_2 = new Launchpad(this,"/PitchAndVelocity_Pad2");
-		
 		NewConfig = new ConfigTable();
-		//NewConfig.initialize("JSON_File");
-		
+
 		try {
 			NewConfig.LoadJsonFile("StationSetup.json");
 			NewConfig.initNetSettings();
@@ -63,24 +57,33 @@ public class MatrixClassProject extends PApplet{
 			e.printStackTrace();
 		}
 		
+		MidiDevice = new ArrayList<Launchpad>(); 
+		MidiDevice.add(new Launchpad(this,"Launchpad Pro",0));
+		MidiDevice.add(new Launchpad(this,"Launchpad Mini",800));
+		
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
 		ControlPanel newPanel2 = new ControlPanel(NewConfig); 
 		newPanel2.setVisible(true);
 		
-		//frame.setVisible(false);
-		surface.setVisible(false); //Hide Main frame
+		//surface.setVisible(false); //Hide Main frame
+		surface.setVisible(true); //Show Main frame
 	}
 
 	public void draw()     
 	{
-		NewLaunchpad.display();
-		//test_count++;  //testing
-		//if(test_count >= 60)
-		//{
-		//	System.out.println("sta:"+Instant.now());
-		//}
+//		test_count++;  //testing
+//		if(test_count >= 60)
+//		{
+//			System.out.println("sta:"+Instant.now());
+//		}
 		
+		background(0);
+		for (int i = 0; i < MidiDevice.size(); i++) 
+		{
+			MidiDevice.get(i).display();
+		}
+
 		for (int i = 0; i < NewConfig._myJsonConfig.getMyStations().size(); i++)
 		{
 			MyStation myStation = NewConfig._myJsonConfig.getMyStations().get(i);
@@ -88,8 +91,9 @@ public class MatrixClassProject extends PApplet{
 			for (int j = 0; j < myStation.getRules().size(); j++)
 			{
 				int Note = myStation.getRules().get(j).getInput();
-				Particle P1 = NewLaunchpad.MainMatrix.get(Note);
-				tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";
+				int PadNumber = myStation.getRules().get(j).getPadNo();
+				Particle P1 = MidiDevice.get(PadNumber).MainMatrix.get(Note);
+				tempStr = tempStr + P1.getRGB_str();
 			}
 			if(tempStr.equals(myStation.getLastTempString()) == false)
 			{
@@ -100,93 +104,28 @@ public class MatrixClassProject extends PApplet{
 			myStation.setLastTempString(tempStr);
 		}
 		
-		//if(test_count >= 60) //testing
-		//{
-		//	System.out.println("End:"+Instant.now());
-		//	test_count = 0;
-		//}
-
+//		if(test_count >= 60) //testing
+//		{
+//			System.out.println("End:"+Instant.now());
+//			test_count = 0;
+//		}
 	}
 	
 	void oscEvent(OscMessage theOscMessage) 
 	{
-		
 		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
-		if(temp_Addr.equals("/PitchAndVelocity"))
+		if(temp_Addr.equals("/PitchAndVelocity"))	
 		{
-			tempNote = theOscMessage.get(0).intValue();
-			tempVelocity = theOscMessage.get(1).intValue(); 
-			NewLaunchpad.update(tempNote,tempVelocity);	
+			_PadNumber = theOscMessage.get(0).intValue();
+			_Note = theOscMessage.get(1).intValue();
+			_Velocity = theOscMessage.get(2).intValue(); 	
+			if(_PadNumber < MidiDevice.size())
+				MidiDevice.get(_PadNumber).update(_Note,_Velocity);	
 		}
-		
-//		System.out.println(theOscMessage.addrPattern());
-		
-		
-		/*
-		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
-		if(temp_Addr.equals("/PitchAndVelocity"))
-		{
-			tempNote = theOscMessage.get(0).intValue();
-			tempVelocity = theOscMessage.get(1).intValue(); 
-			    
-			//if(tempNote >=36 && tempNote <= 99)
-			//	NewLaunchpad.update(tempNote,tempVelocity);
-			
-			
-			if(tempNote >=36 && tempNote <= 99)					// Matrix 8X8
-				NewLaunchpad.update(tempNote,tempVelocity);
-			else												// Frame 8X4
-			{
-				OscMessage myMessage = new OscMessage("/TagAndVelocity");
-				for (int i = 0; i < NewLaunchpad.MyTestconfigTable.Top_SettingList.size(); i ++)
-				{
-					SettingRule setting = NewLaunchpad.MyTestconfigTable.Top_SettingList.get(i);
-					if(tempNote == setting.Note)
-					{
-						myMessage.clearArguments();
-						myMessage.add(setting.Tag);
-						myMessage.add(tempVelocity);
-						oscP5.send(myMessage, setting.NetSettings); 
-					}
-				}
-			}
-			
-			
-			//else
-			//  println("Note:"+tempNote+",Volicity:"+tempVelocity);
-		}
-		*/
 	}
 	
 	public void mousePressed() 
 	{
-//		OscMessage myMessage = new OscMessage("/Velocity1");
-//		int ValueRan = (int) (random(100));
-//		myMessage.add(ValueRan); /* add an int to the osc message */
-//		oscP5.send(myMessage, myRemoteLocation); 
-//
-//		OscMessage myMessage2 = new OscMessage("/Note1");
-//		myMessage2.add(36); /* add an int to the osc message */
-//		oscP5.send(myMessage2, myRemoteLocation); 
-		
-		
-		//OscMessage myMessage = new OscMessage("/Instruction");
-		//int ValueRan = (int) (random(100));
-		//float TestValue = 0.005f;
-		//myMessage.add(32); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		//myMessage.add(255); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		//myMessage.add(0); 
-		
-		//oscP5.send(myMessage, TestLocation); 
-		
-		
 		/*
 		// Bundle Test
 		OscBundle TestBundle = new OscBundle();
@@ -201,12 +140,9 @@ public class MatrixClassProject extends PApplet{
 
 	public void keyPressed() 
 	{
-		NewLaunchpad.changeShape();
-		
-		//String[] lines = loadStrings("list.txt");
-		//println("there are " + lines.length + " lines");
-		//for (int i = 0 ; i < lines.length; i++) {
-		//  println(lines[i]);
-		//}
+		for (int i = 0; i < MidiDevice.size(); i++) 
+		{
+			MidiDevice.get(i).changeShape();
+		}
 	}
 }
