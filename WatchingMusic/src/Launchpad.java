@@ -33,8 +33,8 @@ public class Launchpad
 		
 		MainMatrix = new ArrayList<Particle>();   
 		for(int _note = 0;_note < 128; _note++)		//Launchpad has 128 notes 
-			//MainMatrix.add(new Particle(parent));   		// here!!
-			MainMatrix.add(new FadedOutParticle(parent));   // Polymorphism
+			MainMatrix.add(new Particle(parent));   		// here!!
+			//MainMatrix.add(new FadedOutParticle(parent));   // Polymorphism
 
 		InitParticlePosition();
 	}
@@ -66,17 +66,24 @@ public class Launchpad
 		}
 	}
 
-	public void update(int Note,int Volicity)
+	public void updateVolicity(int Note,int Volicity)
 	{
 		int index = Note;
 		Particle P1 = MainMatrix.get(index); 
 		P1.SetColor(Volicity);
 	}
 	
+	public void updateMode(int Note,int Mode)
+	{
+		int index = Note;
+		Particle P1 = MainMatrix.get(index); 
+		P1.SetShape(Mode);	//test
+	}
+	
 	public void changeShape()
 	{
-		int shape = (int) parent.random(3);
-		for (int i = 0; i < MainMatrix.size(); i ++)
+		int shape = (int) parent.random(3)+1; // 1~3
+		for (int i = 1; i < MainMatrix.size(); i++)
 		{
 			Particle P1 = MainMatrix.get(i);
 			P1.SetShape(shape);
@@ -86,7 +93,7 @@ public class Launchpad
 	public void display()
 	{
 		//parent.background(0);
-		for (int i = 0; i < MainMatrix.size(); i ++)
+		for (int i = 1; i < MainMatrix.size(); i++)
 		{
 			Particle P1 = MainMatrix.get(i);
 			P1.display();

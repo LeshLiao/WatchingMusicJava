@@ -40,7 +40,8 @@ public class MatrixClassProject extends PApplet{
 		background(50);
 		surface.setResizable(true);
 		noStroke(); // no border line
-		frameRate(60);	// 60Hz
+		//frameRate(60);	// 60Hz
+		frameRate(40);		// 40Hz
 		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
@@ -94,6 +95,9 @@ public class MatrixClassProject extends PApplet{
 				int PadNumber = myStation.getRules().get(j).getPadNo();
 				Particle P1 = MidiDevice.get(PadNumber).MainMatrix.get(Note);
 				tempStr = tempStr + P1.getRGB_str();
+				
+				//Particle P1 = MidiDevice.get(PadNumber).MainMatrix.get(Note);//before
+				//tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";     //before
 			}
 			if(tempStr.equals(myStation.getLastTempString()) == false)
 			{
@@ -113,14 +117,22 @@ public class MatrixClassProject extends PApplet{
 	
 	void oscEvent(OscMessage theOscMessage) 
 	{
-		String temp_Addr = theOscMessage.addrPattern().substring(0,17);
-		if(temp_Addr.equals("/PitchAndVelocity"))	
+		String temp_Addr = theOscMessage.addrPattern().substring(0,10);
+		if(temp_Addr.equals("/PitchAndV"))	//PitchAndVelocity
 		{
 			_PadNumber = theOscMessage.get(0).intValue();
 			_Note = theOscMessage.get(1).intValue();
 			_Velocity = theOscMessage.get(2).intValue(); 	
 			if(_PadNumber < MidiDevice.size())
-				MidiDevice.get(_PadNumber).update(_Note,_Velocity);	
+				MidiDevice.get(_PadNumber).updateVolicity(_Note,_Velocity);	
+		}
+		else if(temp_Addr.equals("/PitchAndM"))	//PitchAndMode
+		{
+			_PadNumber = theOscMessage.get(0).intValue();
+			_Note = theOscMessage.get(1).intValue();
+			_Velocity = theOscMessage.get(2).intValue(); 	
+			if(_PadNumber < MidiDevice.size())
+				MidiDevice.get(_PadNumber).updateMode(_Note,_Velocity);
 		}
 	}
 	

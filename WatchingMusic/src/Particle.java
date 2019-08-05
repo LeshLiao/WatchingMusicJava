@@ -18,7 +18,7 @@ public class Particle {
 		parent = p;
 		pos = new PVector(0,0);
 		SlotSize = 0; 
-		shape = 0;
+		shape = 1;
 		MyVolicity = 0;
 		col = new ColorMappingTable(); 
 	}
@@ -66,17 +66,17 @@ public class Particle {
 	{
 		switch(_shape)
 		{
-			case 0:
+			case 1:
 			{
 				parent.ellipse(pos.x+100, pos.y+50, SlotSize, SlotSize);
 				break;
 			}
-			case 1:
+			case 2:
 			{
 				parent.rect(pos.x+50, pos.y,SlotSize,SlotSize,20);	
 				break;
 			}	
-			case 2:
+			case 3:
 			{
 				float testX = pos.x;
 				float testY = pos.y;

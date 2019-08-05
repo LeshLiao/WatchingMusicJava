@@ -181,7 +181,7 @@ public class ControlPanel extends JFrame {
 		textField_port.setColumns(10);
 		
 		textField_ipRange = new JTextField();
-		textField_ipRange.setText("112");
+		textField_ipRange.setText("113");
 		textField_ipRange.setBounds(482, 54, 60, 25);
 		panel.add(textField_ipRange);
 		textField_ipRange.setColumns(10);
