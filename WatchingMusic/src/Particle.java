@@ -29,8 +29,15 @@ public class Particle {
 		pos = new PVector(_x,_y);
 		SlotSize = _size; 
 	}
+	
+	Particle(PApplet p,Particle _source)	//switch particle type
+	{
+		this(p);
+		pos = new PVector(_source.pos.x,_source.pos.y);
+		SlotSize = _source.SlotSize; 
+	}
 
-	public void SetColor(int Volicity)
+	public void SetVolicity(int Volicity)
 	{
 		colorR = col.colorTable[Volicity][0];
 		colorG = col.colorTable[Volicity][1];	

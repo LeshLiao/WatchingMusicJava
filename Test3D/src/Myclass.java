@@ -16,11 +16,13 @@ public class Myclass extends PApplet{
 	public void setup() 
 	{
 		//rectMode(CENTER);
+		noStroke();
 	}
 	float test = 0;
 	float x,y,z;
 	int colorValue = 220;
 	int _angleX = 30;
+	int _angleY = 0;
 
 	
 	int _boxX = 40;
@@ -41,18 +43,18 @@ public class Myclass extends PApplet{
 		text(_colorText, 20, 50); 
 		
 		if(_angleX > 360) _angleX = 0;
-		_angleX++;
-		String _angleXText = "_angleX:"+_angleX;
+		//_angleX++;
+		String _angleXText = "_angleX:"+_angleX+"_angleY:"+_angleY;
 		text(_angleXText, 20, 80); 
 		
 		//delay(10);
 		//pushMatrix();
-		
+		directionalLight(255, 255, 255, (float)0.5, (float)0.5, 0);
 		rotateX(radians(_angleX));
 		//rotateX(radians(45));			// radians(45) is good.
 		//rotateX(radians(0));
 		//rotateY(radians(_angleX));
-		rotateY(radians(0));
+		rotateY(radians(_angleY));
 		rotateZ(radians(0));
 		
 		ambientLight(0,100,255);
@@ -71,5 +73,55 @@ public class Myclass extends PApplet{
 			translate(0, _nextboxY, 0);
 		}
 
+		if (keyPressed == true) 
+		{
+			changeAngle();
+		}
 	}
+	
+	public void changeAngle()
+	{
+	  if (key == CODED) 
+	  {
+		    if (keyCode == UP) 
+		    {
+		    	_angleX++;
+		    } else if (keyCode == DOWN) {
+		    	_angleX--;
+		    } 
+		    else if (keyCode == LEFT) {
+		    	_angleY++;
+		    } 
+		    else if (keyCode == RIGHT) {
+		    	_angleY--;
+		    } 
+	    
+	  } 
+	  if (key == 'd')
+	  {
+	    	_angleX = 0;
+	    	_angleY = 0;
+	  } 
+		
+	}
+	
+	boolean fullscreen = false;
+	public void keyPressed()
+	{
+		if (key=='f') 
+		{
+			if (fullscreen == false) {
+			fullscreen = true;
+			surface.setSize(displayWidth+10, displayHeight+20);
+			surface.setLocation(-10, -40);
+			surface.setAlwaysOnTop(true);
+			} else {
+			fullscreen = false;
+			surface.setSize(1200, 1000);
+			surface.setLocation(10, 10);
+			surface.setAlwaysOnTop(false);
+			}
+		}
+	}
+
 }

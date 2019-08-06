@@ -70,7 +70,7 @@ public class Launchpad
 	{
 		int index = Note;
 		Particle P1 = MainMatrix.get(index); 
-		P1.SetColor(Volicity);
+		P1.SetVolicity(Volicity);
 	}
 	
 	public void updateMode(int Note,int Mode)
@@ -78,6 +78,28 @@ public class Launchpad
 		int index = Note;
 		Particle P1 = MainMatrix.get(index); 
 		P1.SetShape(Mode);	//test
+	}
+	
+	public void changeParticle(int Note,int Mode)
+	{
+		//System.out.println("changeParticle01");
+		Particle P1 = MainMatrix.get(Note); 
+		Particle _newParticle = null;
+		if(Mode == 2)	 				// Faded out 
+		{
+			//System.out.println("changeParticle02");
+			_newParticle = new FadedOutParticle(parent,P1);
+		}
+		else if(Mode == 0 || Mode == 1)	// default mode
+		{
+			//System.out.println("changeParticle03");
+			_newParticle = new Particle(parent,P1);
+		}
+		//System.out.println("P1.MyVolicity="+P1.MyVolicity);
+		_newParticle.SetVolicity(P1.MyVolicity);
+		MainMatrix.set(Note,_newParticle);
+		//System.out.println("_newParticle.MyVolicity="+_newParticle.MyVolicity);
+		//System.out.println("changeParticle04");
 	}
 	
 	public void changeShape()

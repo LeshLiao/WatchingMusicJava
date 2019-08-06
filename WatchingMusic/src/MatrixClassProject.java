@@ -21,6 +21,7 @@ public class MatrixClassProject extends PApplet{
 	
 	int _PadNumber = 0;
 	int _Velocity = 0;
+	int _Mode = 0;
 	int _Note = 0;
 	int test_count = 0; //testing
 	
@@ -41,7 +42,8 @@ public class MatrixClassProject extends PApplet{
 		surface.setResizable(true);
 		noStroke(); // no border line
 		//frameRate(60);	// 60Hz
-		frameRate(40);		// 40Hz
+		//frameRate(40);		// 40Hz
+		frameRate(30);		// 30Hz  30fps
 		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
@@ -130,9 +132,12 @@ public class MatrixClassProject extends PApplet{
 		{
 			_PadNumber = theOscMessage.get(0).intValue();
 			_Note = theOscMessage.get(1).intValue();
-			_Velocity = theOscMessage.get(2).intValue(); 	
+			_Mode = theOscMessage.get(2).intValue(); 	
 			if(_PadNumber < MidiDevice.size())
-				MidiDevice.get(_PadNumber).updateMode(_Note,_Velocity);
+			{
+				//MidiDevice.get(_PadNumber).updateMode(_Note,_Velocity);
+				MidiDevice.get(_PadNumber).changeParticle(_Note,_Mode);
+			}
 		}
 	}
 	
