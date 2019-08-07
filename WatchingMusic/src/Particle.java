@@ -2,21 +2,18 @@ import processing.core.*;
 
 
 public class Particle {
+	PApplet parent; 
+	int MyVolicity;
 	protected int colorR;
 	protected int colorG;
 	protected int colorB;
-	protected int SlotSize;
 	protected int shape;
-	
-	protected int particleWidth = 50;
-	protected int particleHeight = 50;
-	protected int particleDepth = 10;
-	PApplet parent; 
-	int MyVolicity;
+	protected int particleWidth;
+	protected int particleHeight;
+	protected int particleDepth;
 	protected int coordinate_x;
 	protected int coordinate_y;
 	protected int coordinate_z;
-
 	protected ColorMappingTable col; 
 
 	Particle(PApplet p)
@@ -25,23 +22,14 @@ public class Particle {
 		coordinate_x = 0;
 		coordinate_y = 0;
 		coordinate_z = 0;
-		SlotSize = 0; 
+		particleWidth = 0;
+		particleHeight = 0;
+		particleDepth = 0;
 		shape = 1;
 		MyVolicity = 0;
 		col = new ColorMappingTable(); 
 	}
-	
-	Particle(PApplet p,int _x,int _y,int _z,int _width,int _height,int _depth)
-	{
-		this(p);
-		coordinate_x = 0;
-		coordinate_y = 0;
-		coordinate_z = 0;
-		particleWidth = _width;
-		particleHeight = _height;
-		particleDepth = _depth;
-	}
-	
+
 	Particle(PApplet p,Particle _source)	//switch particle type
 	{
 		this(p);

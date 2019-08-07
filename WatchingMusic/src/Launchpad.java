@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import oscP5.OscMessage;
 import processing.core.PApplet;
 
-//import processing.core.*;
-
 public class Launchpad
 {
 	ArrayList<Particle> MainMatrix;
@@ -18,18 +16,25 @@ public class Launchpad
 	final static int SlotGapY = 5;
 	int padPosition_x;
 	int padPosition_y;
+	int padPosition_z;
+	private int angleX;
+	private int angleY;
+	private int angleZ;
 	
 	PApplet parent; // The parent PApplet that we will render ourselves onto
 	OscMessage myMatrixMessage; 
 	String PadName;
 	
-	Launchpad(PApplet _p,String _PadName,int _padPosition_x,int _padPosition_y)
+	Launchpad(PApplet _p,String _PadName,int _padPosition_x,int _padPosition_y,int _padPosition_z)
 	{
 		parent = _p;
 		PadName = _PadName;
 		padPosition_x = _padPosition_x;
 		padPosition_y = _padPosition_y;
-		
+		padPosition_z = _padPosition_z;
+		angleX = 45;
+		angleY = 0;
+		angleZ = 0;
 		MyColor = new ColorMappingTable(); 
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
@@ -61,7 +66,7 @@ public class Launchpad
 			for(int j = 0;j < 10; j++)
 			{	
 				Particle P1 = MainMatrix.get(NoteNumber[i][j]);
-				P1.SetPosition(rectX+padPosition_x,rectY,0,particleWidth,particleHeight,particleDepth);
+				P1.SetPosition(rectX+padPosition_x,rectY,padPosition_z,particleWidth,particleHeight,particleDepth);
 				rectX = rectX + particleWidth + SlotGapX;
 			}
 			rectY = rectY + particleHeight + SlotGapY;
@@ -82,26 +87,33 @@ public class Launchpad
 		P1.SetShape(Mode);	//test
 	}
 	
+	public void AddAngleX(int _value)
+	{
+		angleX += _value;
+	}
+	public void AddAngleY(int _value)
+	{
+		angleY += _value;
+	}
+	public void AddAngleZ(int _value)
+	{
+		angleZ+= _value;
+	}
+	
 	public void changeParticle(int Note,int Mode)
 	{
-		//System.out.println("changeParticle01");
 		Particle P1 = MainMatrix.get(Note); 
 		Particle _newParticle = null;
 		if(Mode == 2)	 				// Faded out 
 		{
-			//System.out.println("changeParticle02");
 			_newParticle = new FadedOutParticle(parent,P1);
 		}
 		else if(Mode == 0 || Mode == 1)	// default mode
 		{
-			//System.out.println("changeParticle03");
 			_newParticle = new Particle(parent,P1);
 		}
-		//System.out.println("P1.MyVolicity="+P1.MyVolicity);
 		_newParticle.SetVolicity(P1.MyVolicity);
 		MainMatrix.set(Note,_newParticle);
-		//System.out.println("_newParticle.MyVolicity="+_newParticle.MyVolicity);
-		//System.out.println("changeParticle04");
 	}
 	
 	public void changeShape()
@@ -130,12 +142,17 @@ public class Launchpad
 		int _pointerY = 0;
 		int _pointerZ = 0;
 
+//		parent.fill(200, 200, 200);
+//		parent.textSize(20);
+//		String _Text = "Pad:"+PadName;
+//		parent.text(_Text, padPosition_x-5, padPosition_y-50); 
+		
 		//parent.directionalLight(255, 255, 255, (float)0.5, (float)0.5, 0);
 		//parent.directionalLight(255, 255, 255, (float)-0.5, (float)-0.5, 0);
 		//parent.ambientLight(0,100,255);
-		parent.rotateX(PApplet.radians(45));
-		parent.rotateY(PApplet.radians(0));
-		parent.rotateZ(PApplet.radians(0));
+//		parent.rotateX(PApplet.radians(angleX));
+//		parent.rotateY(PApplet.radians(angleY));
+//		parent.rotateZ(PApplet.radians(angleZ));
 		parent.stroke(200);
 		for (int i = 1; i < MainMatrix.size(); i++)
 		{

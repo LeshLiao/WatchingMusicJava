@@ -25,6 +25,8 @@ public class MatrixClassProject extends PApplet{
 	int _Note = 0;
 	int test_count = 0; //testing
 	
+	int _angleX = 45;
+	int _angleY = 0;
 	public static void main(String[] args) {
 		PApplet.main("MatrixClassProject");
 	}
@@ -34,7 +36,7 @@ public class MatrixClassProject extends PApplet{
 		//size(1600,800); 		// 2D
 		//fullScreen(1);
 		//fullScreen(2);
-		size(1200,1000,P3D);	// 3D
+		size(1500,1000,P3D);	// 3D
 	}
 
 	public void setup() 
@@ -60,9 +62,10 @@ public class MatrixClassProject extends PApplet{
 		}
 		
 		MidiDevice = new ArrayList<Launchpad>(); 
-		MidiDevice.add(new Launchpad(this,"Launchpad Pro",420,400));
-		MidiDevice.add(new Launchpad(this,"Launchpad Mini",800,0));
-		
+		MidiDevice.add(new Launchpad(this,"Launchpad Pro",570,500,0));
+		MidiDevice.add(new Launchpad(this,"Launchpad Mini",570,80,0));
+		//MidiDevice.add(new Launchpad(this,"Launchpad test",570,500,-100));
+			
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
 		ControlPanel newPanel2 = new ControlPanel(NewConfig); 
@@ -81,6 +84,9 @@ public class MatrixClassProject extends PApplet{
 //		}
 		
 		background(0);
+		rotateX(PApplet.radians(_angleX));
+		rotateY(PApplet.radians(_angleY));
+		rotateZ(PApplet.radians(0));
 		for (int i = 0; i < MidiDevice.size(); i++) 
 		{
 			//MidiDevice.get(i).display();
@@ -106,6 +112,11 @@ public class MatrixClassProject extends PApplet{
 				oscP5.send(myMatrixMessage, myStation.getNetSettings());
 			}
 			myStation.setLastTempString(tempStr);
+		}
+		
+		if (keyPressed == true) 
+		{
+			changeAngle();
 		}
 		
 //		if(test_count >= 60) //testing
@@ -158,5 +169,30 @@ public class MatrixClassProject extends PApplet{
 		{
 			MidiDevice.get(i).changeShape();
 		}
+	}
+	
+	public void changeAngle()
+	{
+	  if (key == CODED) 
+	  {
+		    if (keyCode == UP) 
+		    {
+		    	_angleX++;
+		    } else if (keyCode == DOWN) {
+		    	_angleX--;
+		    } 
+		    else if (keyCode == LEFT) {
+		    	_angleY++;
+		    } 
+		    else if (keyCode == RIGHT) {
+		    	_angleY--;
+		    } 
+	  } 
+	  if (key == 'd')
+	  {
+	    	_angleX = 0;
+	    	_angleY = 0;
+	  } 
+		
 	}
 }

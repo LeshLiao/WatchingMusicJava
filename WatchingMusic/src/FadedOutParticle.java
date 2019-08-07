@@ -27,7 +27,6 @@ public class FadedOutParticle extends Particle{
 		this(p);
 		coordinate_x = _source.coordinate_x;
 		coordinate_y = _source.coordinate_y;
-		SlotSize = _source.SlotSize; 
 		
 		// create a model 02
 		floatModel02 = new float[_floatArrayCount];
