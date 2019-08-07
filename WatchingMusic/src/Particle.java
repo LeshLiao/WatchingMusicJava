@@ -5,36 +5,52 @@ public class Particle {
 	protected int colorR;
 	protected int colorG;
 	protected int colorB;
-	PVector pos;
 	protected int SlotSize;
 	protected int shape;
+	
+	protected int particleWidth = 50;
+	protected int particleHeight = 50;
+	protected int particleDepth = 10;
 	PApplet parent; 
 	int MyVolicity;
-	
+	protected int coordinate_x;
+	protected int coordinate_y;
+	protected int coordinate_z;
+
 	protected ColorMappingTable col; 
 
 	Particle(PApplet p)
 	{
 		parent = p;
-		pos = new PVector(0,0);
+		coordinate_x = 0;
+		coordinate_y = 0;
+		coordinate_z = 0;
 		SlotSize = 0; 
 		shape = 1;
 		MyVolicity = 0;
 		col = new ColorMappingTable(); 
 	}
 	
-	Particle(PApplet p,int _x,int _y,int _size)
+	Particle(PApplet p,int _x,int _y,int _z,int _width,int _height,int _depth)
 	{
 		this(p);
-		pos = new PVector(_x,_y);
-		SlotSize = _size; 
+		coordinate_x = 0;
+		coordinate_y = 0;
+		coordinate_z = 0;
+		particleWidth = _width;
+		particleHeight = _height;
+		particleDepth = _depth;
 	}
 	
 	Particle(PApplet p,Particle _source)	//switch particle type
 	{
 		this(p);
-		pos = new PVector(_source.pos.x,_source.pos.y);
-		SlotSize = _source.SlotSize; 
+		coordinate_x = _source.coordinate_x;
+		coordinate_y = _source.coordinate_y;
+		coordinate_z = _source.coordinate_z;
+		particleWidth = _source.particleWidth; 
+		particleHeight = _source.particleHeight;
+		particleDepth = _source.particleDepth;	
 	}
 
 	public void SetVolicity(int Volicity)
@@ -45,11 +61,14 @@ public class Particle {
 		MyVolicity = Volicity;
 	}
 
-	public void SetPosition(int _x,int _y,int _size)
+	public void SetPosition(int _x,int _y,int _z,int _width,int _height,int _depth)
 	{
-		pos.x = _x;
-		pos.y = _y;
-		SlotSize = _size;
+		coordinate_x = _x;
+		coordinate_y = _y;
+		coordinate_z = _z;
+		particleWidth = _width;
+		particleHeight = _height;
+		particleDepth = _depth;
 	}
 	
 	public void SetShape(int _shape)
@@ -61,6 +80,12 @@ public class Particle {
 	{
 		parent.fill(colorR,colorG,colorB);
 		draw(shape);
+	}
+	
+	public void display(int _shape)
+	{
+		parent.fill(colorR,colorG,colorB);
+		draw(_shape);
 	}
 	
 	public String getRGB_str()
@@ -75,18 +100,18 @@ public class Particle {
 		{
 			case 1:
 			{
-				parent.ellipse(pos.x+100, pos.y+50, SlotSize, SlotSize);
+				parent.ellipse(coordinate_x+100, coordinate_y+50, particleWidth, particleHeight);
 				break;
 			}
 			case 2:
 			{
-				parent.rect(pos.x+50, pos.y,SlotSize,SlotSize,20);	
+				parent.rect(coordinate_x+50, coordinate_y,particleWidth,particleHeight,20);	
 				break;
 			}	
 			case 3:
 			{
-				float testX = pos.x;
-				float testY = pos.y;
+				float testX = coordinate_x;
+				float testY = coordinate_y;
 				int ratio = 2;
 				parent.beginShape();
 				parent.vertex((50*ratio)+testX, (15*ratio)+testY); 
@@ -96,9 +121,19 @@ public class Particle {
 				parent.endShape();
 				break;
 			}
+			case 4:
+			{
+				parent.box(particleWidth,particleHeight,particleDepth);
+				break;
+			}
+			case 5:
+			{
+				parent.sphere(15);
+				break;
+			}
 			default:
 			{
-				parent.rect(pos.x+50, pos.y,SlotSize,SlotSize,20);
+				parent.rect(coordinate_x+50, coordinate_y,particleWidth,particleHeight,20);
 				break;	
 			}
 		}

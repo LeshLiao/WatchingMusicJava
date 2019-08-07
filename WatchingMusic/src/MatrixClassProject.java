@@ -31,19 +31,18 @@ public class MatrixClassProject extends PApplet{
 
 	public void settings() 
 	{
-		size(1600,800);
+		//size(1600,800); 		// 2D
 		//fullScreen(1);
 		//fullScreen(2);
+		size(1200,1000,P3D);	// 3D
 	}
 
 	public void setup() 
 	{
 		background(50);
 		surface.setResizable(true);
-		noStroke(); // no border line
-		//frameRate(60);	// 60Hz
-		//frameRate(40);		// 40Hz
-		frameRate(30);		// 30Hz  30fps
+		noStroke(); 				// no border line
+		frameRate(30);				// 30Hz  30fps
 		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
@@ -61,8 +60,8 @@ public class MatrixClassProject extends PApplet{
 		}
 		
 		MidiDevice = new ArrayList<Launchpad>(); 
-		MidiDevice.add(new Launchpad(this,"Launchpad Pro",0));
-		MidiDevice.add(new Launchpad(this,"Launchpad Mini",800));
+		MidiDevice.add(new Launchpad(this,"Launchpad Pro",420,400));
+		MidiDevice.add(new Launchpad(this,"Launchpad Mini",800,0));
 		
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
@@ -84,8 +83,10 @@ public class MatrixClassProject extends PApplet{
 		background(0);
 		for (int i = 0; i < MidiDevice.size(); i++) 
 		{
-			MidiDevice.get(i).display();
+			//MidiDevice.get(i).display();
+			MidiDevice.get(i).display3D();
 		}
+		
 
 		for (int i = 0; i < NewConfig._myJsonConfig.getMyStations().size(); i++)
 		{
@@ -97,9 +98,6 @@ public class MatrixClassProject extends PApplet{
 				int PadNumber = myStation.getRules().get(j).getPadNo();
 				Particle P1 = MidiDevice.get(PadNumber).MainMatrix.get(Note);
 				tempStr = tempStr + P1.getRGB_str();
-				
-				//Particle P1 = MidiDevice.get(PadNumber).MainMatrix.get(Note);//before
-				//tempStr = tempStr + Integer.toString(P1.MyVolicity)+",";     //before
 			}
 			if(tempStr.equals(myStation.getLastTempString()) == false)
 			{
@@ -135,7 +133,6 @@ public class MatrixClassProject extends PApplet{
 			_Mode = theOscMessage.get(2).intValue(); 	
 			if(_PadNumber < MidiDevice.size())
 			{
-				//MidiDevice.get(_PadNumber).updateMode(_Note,_Velocity);
 				MidiDevice.get(_PadNumber).changeParticle(_Note,_Mode);
 			}
 		}

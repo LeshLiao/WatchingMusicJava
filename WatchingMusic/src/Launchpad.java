@@ -9,24 +9,26 @@ public class Launchpad
 {
 	ArrayList<Particle> MainMatrix;
 	ColorMappingTable MyColor;
-	final static int MatrixHeight = 8;                
 	final static int MatrixWidth = 8;
-	final static int SlotSize = 50;
-	final static int SlotGapX = 20;
-	final static int SlotGapY = 20;
-	int Edge_X;						
+	final static int MatrixHeight = 8;                
+	final static int particleWidth = 35;
+	final static int particleHeight = 35;
+	final static int particleDepth = 5;
+	final static int SlotGapX = 5;
+	final static int SlotGapY = 5;
+	int padPosition_x;
+	int padPosition_y;
 	
 	PApplet parent; // The parent PApplet that we will render ourselves onto
 	OscMessage myMatrixMessage; 
 	String PadName;
-	//ConfigTable MyTestconfigTable;
-
 	
-	Launchpad(PApplet _p,String _PadName,int _Edge_X)
+	Launchpad(PApplet _p,String _PadName,int _padPosition_x,int _padPosition_y)
 	{
 		parent = _p;
 		PadName = _PadName;
-		Edge_X = _Edge_X;
+		padPosition_x = _padPosition_x;
+		padPosition_y = _padPosition_y;
 		
 		MyColor = new ColorMappingTable(); 
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
@@ -52,17 +54,17 @@ public class Launchpad
                 			  {115, 36, 37, 38, 39, 68, 69, 70, 71,107},
                 			  {  0,116,117,118,119,120,121,122,123,  0}};
 		
-		int rectY = 0;
+		int rectY = padPosition_y;
 		for(int i = 0;i < 10; i++)
 		{
 			int rectX = 0;
 			for(int j = 0;j < 10; j++)
 			{	
 				Particle P1 = MainMatrix.get(NoteNumber[i][j]);
-				P1.SetPosition(rectX+Edge_X,rectY,SlotSize);
-				rectX = rectX + SlotSize + SlotGapX;
+				P1.SetPosition(rectX+padPosition_x,rectY,0,particleWidth,particleHeight,particleDepth);
+				rectX = rectX + particleWidth + SlotGapX;
 			}
-			rectY = rectY + SlotSize + SlotGapY;
+			rectY = rectY + particleHeight + SlotGapY;
 		}
 	}
 
@@ -120,6 +122,30 @@ public class Launchpad
 			Particle P1 = MainMatrix.get(i);
 			P1.display();
 		}
+	}
+	
+	public void display3D()
+	{
+		int _pointerX = 0;	
+		int _pointerY = 0;
+		int _pointerZ = 0;
+
+		//parent.directionalLight(255, 255, 255, (float)0.5, (float)0.5, 0);
+		//parent.directionalLight(255, 255, 255, (float)-0.5, (float)-0.5, 0);
+		//parent.ambientLight(0,100,255);
+		parent.rotateX(PApplet.radians(45));
+		parent.rotateY(PApplet.radians(0));
+		parent.rotateZ(PApplet.radians(0));
+		parent.stroke(200);
+		for (int i = 1; i < MainMatrix.size(); i++)
+		{
+			Particle P1 = MainMatrix.get(i);
+			parent.translate(P1.coordinate_x - _pointerX, P1.coordinate_y - _pointerY, P1.coordinate_z - _pointerZ);
+			P1.display(4);
+			_pointerX = P1.coordinate_x;
+			_pointerY = P1.coordinate_y;
+			_pointerZ = P1.coordinate_z;
+		}	
 	}
 
 }

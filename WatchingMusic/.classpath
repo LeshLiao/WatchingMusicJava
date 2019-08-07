@@ -7,5 +7,21 @@
 	<classpathentry kind="lib" path="ProcessingLib/xbee-java-library-1.2.1.jar"/>
 	<classpathentry kind="lib" path="ProcessingLib/gson-2.6.2.jar"/>
 	<classpathentry kind="lib" path="ProcessingLib/jsch-0.1.55.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-linux-aarch64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-linux-aarch64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-linux-amd64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-linux-armv6hf.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-linux-i586.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-macosx-universal.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-windows-amd64.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all-natives-windows-i586.jar"/>
+	<classpathentry kind="lib" path="ProcessingLib/jogl-all.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

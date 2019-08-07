@@ -25,7 +25,8 @@ public class FadedOutParticle extends Particle{
 	FadedOutParticle(PApplet p,Particle _source)	//switch particle type
 	{
 		this(p);
-		pos = new PVector(_source.pos.x,_source.pos.y);
+		coordinate_x = _source.coordinate_x;
+		coordinate_y = _source.coordinate_y;
 		SlotSize = _source.SlotSize; 
 		
 		// create a model 02
