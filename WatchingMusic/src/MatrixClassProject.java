@@ -27,6 +27,7 @@ public class MatrixClassProject extends PApplet{
 	
 	int _angleX = 45;
 	int _angleY = 0;
+	int _angleZ = 0;
 	public static void main(String[] args) {
 		PApplet.main("MatrixClassProject");
 	}
@@ -41,7 +42,6 @@ public class MatrixClassProject extends PApplet{
 
 	public void setup() 
 	{
-		background(50);
 		surface.setResizable(true);
 		noStroke(); 				// no border line
 		frameRate(30);				// 30Hz  30fps
@@ -77,16 +77,17 @@ public class MatrixClassProject extends PApplet{
 
 	public void draw()     
 	{
-//		test_count++;  //testing
-//		if(test_count >= 60)
+		
+//		if(test_count == 0)
 //		{
 //			System.out.println("sta:"+Instant.now());
 //		}
+//		test_count++;  //testing
 		
 		background(0);
 		rotateX(PApplet.radians(_angleX));
 		rotateY(PApplet.radians(_angleY));
-		rotateZ(PApplet.radians(0));
+		rotateZ(PApplet.radians(_angleZ));
 		for (int i = 0; i < MidiDevice.size(); i++) 
 		{
 			//MidiDevice.get(i).display();
@@ -119,11 +120,12 @@ public class MatrixClassProject extends PApplet{
 			changeAngle();
 		}
 		
-//		if(test_count >= 60) //testing
+//		if(test_count >= 50) //testing
 //		{
 //			System.out.println("End:"+Instant.now());
 //			test_count = 0;
 //		}
+		
 	}
 	
 	void oscEvent(OscMessage theOscMessage) 
@@ -173,26 +175,79 @@ public class MatrixClassProject extends PApplet{
 	
 	public void changeAngle()
 	{
-	  if (key == CODED) 
-	  {
-		    if (keyCode == UP) 
-		    {
-		    	_angleX++;
-		    } else if (keyCode == DOWN) {
-		    	_angleX--;
-		    } 
-		    else if (keyCode == LEFT) {
-		    	_angleY++;
-		    } 
-		    else if (keyCode == RIGHT) {
-		    	_angleY--;
-		    } 
-	  } 
-	  if (key == 'd')
-	  {
-	    	_angleX = 0;
-	    	_angleY = 0;
-	  } 
+		
+		switch(key)
+		{
+			case '8':
+			{
+				_angleX++;
+				break;
+			}
+			case '2':
+			{
+				_angleX--;
+				break;
+			}
+			case '4':
+			{
+				_angleY--;
+				break;
+			}
+			case '6':
+			{
+				_angleY++;
+				break;
+			}
+			case '9':
+			{
+				_angleZ--;
+				break;
+			}
+			case '1':
+			{
+				_angleZ++;
+				break;
+			}
+			case '5':
+			{
+				_angleX = 0;
+				_angleY = 0;
+				_angleZ = 0;
+				break;
+			}
+			case 'w':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionY(-1);
+				}
+				break;
+			}
+			case 's':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionY(1);
+				}
+				break;
+			}
+			case 'a':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionX(-1);
+				}
+				break;
+			}
+			case 'd':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionX(1);
+				}
+				break;
+			}
+		}
 		
 	}
 }

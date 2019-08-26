@@ -9,11 +9,11 @@ public class Launchpad
 	ColorMappingTable MyColor;
 	final static int MatrixWidth = 8;
 	final static int MatrixHeight = 8;                
-	final static int particleWidth = 35;
-	final static int particleHeight = 35;
-	final static int particleDepth = 5;
-	final static int SlotGapX = 5;
-	final static int SlotGapY = 5;
+	final static int particleWidth = 30;
+	final static int particleHeight = 30;
+	final static int particleDepth = 8;	//7
+	final static int SlotGapX = 10;
+	final static int SlotGapY = 10;
 	int padPosition_x;
 	int padPosition_y;
 	int padPosition_z;
@@ -72,6 +72,19 @@ public class Launchpad
 			rectY = rectY + particleHeight + SlotGapY;
 		}
 	}
+	
+	public void updatePositionX(int _valueX)
+	{
+		padPosition_x = padPosition_x + _valueX;
+		InitParticlePosition();
+	}
+	
+	public void updatePositionY(int _valueY)
+	{
+		padPosition_y = padPosition_y + _valueY;
+		InitParticlePosition();
+	}
+	
 
 	public void updateVolicity(int Note,int Volicity)
 	{
@@ -159,6 +172,7 @@ public class Launchpad
 			Particle P1 = MainMatrix.get(i);
 			parent.translate(P1.coordinate_x - _pointerX, P1.coordinate_y - _pointerY, P1.coordinate_z - _pointerZ);
 			P1.display(4);
+			//P1.display(2);
 			_pointerX = P1.coordinate_x;
 			_pointerY = P1.coordinate_y;
 			_pointerZ = P1.coordinate_z;
