@@ -1,0 +1,2 @@
+5G wifi
+2PWM (channel 0 and channel 1)

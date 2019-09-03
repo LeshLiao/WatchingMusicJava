@@ -44,7 +44,7 @@ public class MatrixClassProject extends PApplet{
 	{
 		surface.setResizable(true);
 		noStroke(); 				// no border line
-		frameRate(30);				// 30Hz  30fps
+		frameRate(50);				// 30Hz  30fps
 		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
@@ -90,8 +90,8 @@ public class MatrixClassProject extends PApplet{
 		rotateZ(PApplet.radians(_angleZ));
 		for (int i = 0; i < MidiDevice.size(); i++) 
 		{
-			//MidiDevice.get(i).display();
-			MidiDevice.get(i).display3D();
+			//MidiDevice.get(i).display();	//2D
+			MidiDevice.get(i).display3D();  //3D
 		}
 		
 

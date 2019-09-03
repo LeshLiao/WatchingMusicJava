@@ -21,9 +21,18 @@ public class StatusTable extends JTable{
 		String [][] td = {{"<No Device>","","","",""}};
 		//String [][] td = {{"192.168.0.11","","","",""},{"192.168.0.22","","","",""},{"192.168.0.33","","","",""}};
 		tmpTableData = td;
-        BookField = new String[]{"IP","Port","Git SHA","Json Timestamp","OSC server"};
+        BookField = new String[]{"IP","Port","Git SHA","Json Timestamp","OSC server","Info"};
         tmodel = new DefaultTableModel(tmpTableData,BookField); //建立表格
         this.setModel(tmodel);
+        
+        this.getColumnModel().getColumn(0).setPreferredWidth(70);
+        this.getColumnModel().getColumn(1).setPreferredWidth(40);	
+        this.getColumnModel().getColumn(2).setPreferredWidth(60);
+        this.getColumnModel().getColumn(3).setPreferredWidth(80);
+        this.getColumnModel().getColumn(4).setPreferredWidth(60);
+        this.getColumnModel().getColumn(5).setPreferredWidth(300);
+        
+        
         listOfLists = new ArrayList<List<String>>();
 	}
 	public boolean ClearTable()
@@ -32,7 +41,7 @@ public class StatusTable extends JTable{
 		availableAddressList.list().clear();
 		
 		int rowCount = tmodel.getRowCount();
-		//Remove rows one by one from the end of the table
+		//Remove rows one by one from the end of the table  
 		for (int i = rowCount - 1; i >= 0; i--) {
 			tmodel.removeRow(i);
 		}
@@ -49,6 +58,7 @@ public class StatusTable extends JTable{
 			tmodel.setValueAt("", i, 2);
 			tmodel.setValueAt("", i, 3);
 			tmodel.setValueAt("", i, 4);
+			tmodel.setValueAt("", i, 5);
 		}
 		return true;
 	}
@@ -102,6 +112,12 @@ public class StatusTable extends JTable{
 		int index = getIndexByAddress(theIPaddress);
 		//System.out.println("UpdateJsonTimestamp:"+theIPaddress+",GitSha:"+JsonTimestamp+",index="+Integer.toString(index));
 		if(index >= 0)	tmodel.setValueAt(JsonTimestamp,index , 3);
+	}
+	
+	public void UpdateInfo(String theIPaddress,String _info) 
+	{
+		int index = getIndexByAddress(theIPaddress);
+		if(index >= 0)	tmodel.setValueAt(_info,index , 5);
 	}
 	
 	private int getIndexByAddress(String theIPaddress) 

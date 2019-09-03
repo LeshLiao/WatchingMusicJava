@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+
 public class ControlPanel extends JFrame {
 
 	private JPanel contentPane;
@@ -53,6 +54,7 @@ public class ControlPanel extends JFrame {
 	private JTextField textField_timeout;
 	private JTextField textField_ipBegin;
 	private JTextField txtSudoChmodr;
+	private JLabel lblNewLabel_Total;
 	/**
 	 * Create the frame.
 	 */
@@ -68,7 +70,7 @@ public class ControlPanel extends JFrame {
 		
 		setBackground(Color.DARK_GRAY);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 826, 708);
+		setBounds(100, 100, 834, 808);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -83,15 +85,29 @@ public class ControlPanel extends JFrame {
 		JButton btnNewButton = new JButton("Scan network");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				Stable.ClearTable();
+				//Stable.repaint();
+				//Stable.fireTableDataChanged();
+				//.repaint();
+				//Stable.fireTableDataChanged();
+				//tableModel.fireTableDataChanged()
 				String subnet = textField_Subnet.getText();
 				int port = Integer.parseInt(textField_port.getText());
 				int ipBegin = Integer.parseInt(textField_ipBegin.getText());
 				int ipEnd = Integer.parseInt(textField_ipRange.getText());
 				int timeout = Integer.parseInt(textField_timeout.getText());
 				
-				Stable.ClearTable();
-				System.out.println("Button Event: Scan subnet:"+subnet);
-
+				//System.out.println("aaa");
+				
+				//System.out.println("Button Event: Scan subnet:"+subnet);
+				//System.out.println("bbb");
+//				try {
+//					Thread.sleep(1000);
+//				} catch (InterruptedException e) {
+//
+//				}
+				//System.out.println("ccc");
+				
 				try {
 					checkHosts(subnet,timeout,port,ipBegin,ipEnd);
 				} catch (IOException ex) {
@@ -100,11 +116,15 @@ public class ControlPanel extends JFrame {
 				}
 			}
 		});
-		btnNewButton.setBounds(57, 53, 125, 27);
+		btnNewButton.setBounds(34, 53, 135, 27);
 		panel.add(btnNewButton);
 		
 		JButton btnInitalAllDevice = new JButton("Inital All Device");
-		btnInitalAllDevice.setBounds(14, 13, 153, 27);
+		btnInitalAllDevice.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		btnInitalAllDevice.setBounds(463, 93, 153, 27);
 		panel.add(btnInitalAllDevice);
 		
 		JButton btnStopAllService = new JButton("Stop all service");
@@ -126,7 +146,7 @@ public class ControlPanel extends JFrame {
 				System.out.println("Button Event: STOP_OSC");
 			}
 		});
-		btnStopAllService.setBounds(57, 93, 125, 27);
+		btnStopAllService.setBounds(34, 93, 135, 27);
 		panel.add(btnStopAllService);
 		
 		JButton btnRunAllService = new JButton("Run all service");
@@ -153,21 +173,6 @@ public class ControlPanel extends JFrame {
 		btnRunAllService.setBounds(195, 93, 125, 27);
 		panel.add(btnRunAllService);
 		
-		JButton btnCheckOsc = new JButton("Update Device Info");
-		btnCheckOsc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Stable.ClearTableStatus();
-				OscMessage myMessage = new OscMessage("/Instruction");
-				myMessage.add("CHECK_OSC");
-				myMessage.add(_myHostAddress); 
-				myMessage.add(Integer.toString(_myHostport)); 
-				oscP5.send(myMessage, Stable.reachableAddressList);
-				System.out.println("Button Event: CHECK_OSC");
-			}
-		});
-		btnCheckOsc.setBounds(334, 93, 208, 27);
-		panel.add(btnCheckOsc);
-		
 		textField_Subnet = new JTextField();
 		textField_Subnet.setText("192.168.1");
 		textField_Subnet.setBounds(196, 54, 116, 25);
@@ -187,7 +192,7 @@ public class ControlPanel extends JFrame {
 		textField_ipRange.setColumns(10);
 		
 		textField_timeout = new JTextField();
-		textField_timeout.setText("50");
+		textField_timeout.setText("60");
 		textField_timeout.setBounds(556, 54, 60, 25);
 		panel.add(textField_timeout);
 		textField_timeout.setColumns(10);
@@ -198,14 +203,23 @@ public class ControlPanel extends JFrame {
 		textField_ipBegin.setBounds(408, 54, 60, 25);
 		panel.add(textField_ipBegin);
 		
+		JButton btnTest_2 = new JButton("Clean device table");
+		btnTest_2.setBounds(34, 13, 135, 27);
+		panel.add(btnTest_2);
+		btnTest_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Stable.ClearTable();
+			}
+		});
+		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_2.setBounds(27, 482, 759, 166);
+		panel_2.setBounds(27, 434, 775, 279);
 		contentPane.add(panel_2);
 		panel_2.setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(14, 0, 731, 140);
+		scrollPane.setBounds(14, 13, 745, 253);
 		panel_2.add(scrollPane);
 		Stable = new StatusTable();
 		scrollPane.setViewportView(Stable);
@@ -214,7 +228,7 @@ public class ControlPanel extends JFrame {
 		JPanel panel_1 = new JPanel();
 		panel_1.setLayout(null);
 		panel_1.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_1.setBounds(27, 233, 759, 139);
+		panel_1.setBounds(27, 215, 759, 139);
 		contentPane.add(panel_1);
 		oscP5.addListener(new OscEventListener()
 		{
@@ -240,6 +254,11 @@ public class ControlPanel extends JFrame {
 						//System.out.println("str:"+arg0.get(3).stringValue());
 						Stable.UpdateJsonTimestamp(arg0.get(0).stringValue(),arg0.get(3).stringValue());
 					}
+					if(arg0.typetag().length() > 4)
+					{
+						Stable.UpdateInfo(arg0.get(0).stringValue(),arg0.get(4).stringValue());
+					}
+					
 				}
 				System.out.println("### currently there are "+Stable.availableAddressList.list().size()+" available OSC device.");
 			}
@@ -252,8 +271,8 @@ public class ControlPanel extends JFrame {
 			}
 		});
 		
-		JButton button_2 = new JButton("Sync Json Files");
-		button_2.addActionListener(new ActionListener() {
+		JButton btnSyncJsonFilesosc = new JButton("Sync Json Files/reload/update info(osc)");
+		btnSyncJsonFilesosc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SyncFile newSyncFile;
 				System.out.println("Button Event: SYNC_JSON");
@@ -288,8 +307,8 @@ public class ControlPanel extends JFrame {
 				
 			}
 		});
-		button_2.setBounds(14, 53, 153, 27);
-		panel_1.add(button_2);
+		btnSyncJsonFilesosc.setBounds(14, 53, 268, 27);
+		panel_1.add(btnSyncJsonFilesosc);
 		
 		JButton button_3 = new JButton("Pull latest version");
 		button_3.addActionListener(new ActionListener() {
@@ -302,8 +321,8 @@ public class ControlPanel extends JFrame {
 		button_3.setBounds(14, 13, 153, 27);
 		panel_1.add(button_3);
 		
-		JButton button = new JButton("Breathing light");
-		button.addActionListener(new ActionListener() {
+		JButton btnBreathingLightosc = new JButton("Breathing light(osc)");
+		btnBreathingLightosc.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				OscMessage myMessage = new OscMessage("/Instruction");
 				myMessage.add("BREATHING_LIGHT");
@@ -314,8 +333,8 @@ public class ControlPanel extends JFrame {
 				System.out.println("Button Event: BREATHING_LIGHT");
 			}
 		});
-		button.setBounds(195, 13, 125, 27);
-		panel_1.add(button);
+		btnBreathingLightosc.setBounds(518, 53, 145, 27);
+		panel_1.add(btnBreathingLightosc);
 		
 		JButton btnSendCommend = new JButton("Send Commend");
 		btnSendCommend.addActionListener(new ActionListener() {
@@ -339,13 +358,28 @@ public class ControlPanel extends JFrame {
 				SendCommendToAllDevice("sudo halt");
 			}
 		});
-		btnNewButton_Shutdown_all.setBounds(337, 13, 125, 27);
+		btnNewButton_Shutdown_all.setBounds(181, 13, 125, 27);
 		panel_1.add(btnNewButton_Shutdown_all);
+		
+		JButton btnCheckOsc = new JButton("Update Device Info(osc)");
+		btnCheckOsc.setBounds(296, 53, 208, 27);
+		panel_1.add(btnCheckOsc);
+		btnCheckOsc.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Stable.ClearTableStatus();
+				OscMessage myMessage = new OscMessage("/Instruction");
+				myMessage.add("CHECK_OSC");
+				myMessage.add(_myHostAddress); 
+				myMessage.add(Integer.toString(_myHostport)); 
+				oscP5.send(myMessage, Stable.reachableAddressList);
+				System.out.println("Button Event: CHECK_OSC");
+			}
+		});
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setLayout(null);
 		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setBounds(27, 404, 759, 54);
+		panel_3.setBounds(27, 367, 759, 54);
 		contentPane.add(panel_3);
 		
 		JButton btnTest_1 = new JButton("test01");
@@ -360,27 +394,22 @@ public class ControlPanel extends JFrame {
 		btnTest_1.setBounds(14, 13, 153, 27);
 		panel_3.add(btnTest_1);
 		
-		JButton btnTest_2 = new JButton("test02");
-		btnTest_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Stable.ClearTable();
-			}
-		});
-		btnTest_2.setBounds(181, 13, 153, 27);
-		panel_3.add(btnTest_2);
-		
 		JButton btnTest_3 = new JButton("test03");
 		btnTest_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Stable.AddToAvailableAddressList("192.168.0.3",100);
 			}
 		});
-		btnTest_3.setBounds(348, 13, 153, 27);
+		btnTest_3.setBounds(181, 13, 153, 27);
 		panel_3.add(btnTest_3);
 		
 		JButton btnTest_4 = new JButton("test04");
-		btnTest_4.setBounds(515, 13, 153, 27);
+		btnTest_4.setBounds(348, 13, 153, 27);
 		panel_3.add(btnTest_4);
+		
+		lblNewLabel_Total = new JLabel("Total:");
+		lblNewLabel_Total.setBounds(52, 726, 176, 19);
+		contentPane.add(lblNewLabel_Total);
 	}
 	private void init() throws UnknownHostException
 	{
@@ -412,7 +441,7 @@ public class ControlPanel extends JFrame {
 		
 			if(_myHostAddress.equals(host))
 				continue;
-		
+
 			if (InetAddress.getByName(host).isReachable(_timeout))
 			{
 	            try 
@@ -425,6 +454,7 @@ public class ControlPanel extends JFrame {
 				}
 			}
 		}
+		lblNewLabel_Total.setText("Total: "+Integer.toString(Stable.reachableAddressList.list().size()));
 		System.out.println("### currently there are "+Stable.reachableAddressList.list().size()+" reachable locations.");
 	}
 }
