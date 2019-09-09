@@ -1,7 +1,7 @@
 {
-  "ProjectName": "Light Project - Model_006 20190903",
+  "ProjectName": "Light Project - Model_006 20190904",
   "FileVersion": "00.00.01",
-  "Timestamp": "1567147777",
+  "Timestamp": "1567140904",
   "MyStations": [
 	{
       "StationID": 0,
@@ -44,7 +44,7 @@
 	{
       "StationID": 0,
       "Name": "Led Matrix pad - Column3&4&DMX",
-      "IP": "192.168.1.101",
+      "IP": "192.168.1.102",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
@@ -78,7 +78,7 @@
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Column5&6",
-      "IP": "192.168.1.102",
+      "IP": "192.168.1.106",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
@@ -108,7 +108,7 @@
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Column7&8&Right",
-      "IP": "192.168.1.105",
+      "IP": "192.168.1.107",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
@@ -146,7 +146,7 @@
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Left&Top",
-      "IP": "192.168.1.106",
+      "IP": "192.168.1.108",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[

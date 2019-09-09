@@ -11,12 +11,12 @@ public class Launchpad
 	final static int MatrixHeight = 8;                
 	final static int particleWidth = 30;
 	final static int particleHeight = 30;
-	final static int particleDepth = 8;	//7
-	final static int SlotGapX = 10;
-	final static int SlotGapY = 10;
-	int padPosition_x;
-	int padPosition_y;
-	int padPosition_z;
+	final static int particleDepth = 20;	//8
+	final static int SlotGapX = 20;			//10
+	final static int SlotGapY = 20;			//10
+	public int padPosition_x;
+	public int padPosition_y;
+	public int padPosition_z;
 	private int angleX;
 	private int angleY;
 	private int angleZ;
@@ -24,8 +24,10 @@ public class Launchpad
 	PApplet parent; // The parent PApplet that we will render ourselves onto
 	OscMessage myMatrixMessage; 
 	String PadName;
+	int[][] NoteNumber;
+	int[] MidiMappingTable;
 	
-	Launchpad(PApplet _p,String _PadName,int _padPosition_x,int _padPosition_y,int _padPosition_z)
+	Launchpad(PApplet _p,String _PadName,int _padPosition_x,int _padPosition_y,int _padPosition_z,int _rotateMode)
 	{
 		parent = _p;
 		PadName = _PadName;
@@ -44,21 +46,25 @@ public class Launchpad
 			//MainMatrix.add(new FadedOutParticle(parent));   // Polymorphism
 
 		InitParticlePosition();
+		InitMidiRotate(_rotateMode);
 	}
 	
 	private void InitParticlePosition()
 	{
-		int[][] NoteNumber = {{  0, 28, 29, 30, 31, 32, 33, 34, 35,  0},
-                			  {108, 64, 65, 66, 67, 96, 97, 98, 99,100},
-                			  {109, 60, 61, 62, 63, 92, 93, 94, 95,101},
-                			  {110, 56, 57, 58, 59, 88, 89, 90, 91,102},
-                			  {111, 52, 53, 54, 55, 84, 85, 86, 87,103},
-                			  {112, 48, 49, 50, 51, 80, 81, 82, 83,104},
-                			  {113, 44, 45, 46, 47, 76, 77, 78, 79,105},
-                			  {114, 40, 41, 42, 43, 72, 73, 74, 75,106},
-                			  {115, 36, 37, 38, 39, 68, 69, 70, 71,107},
-                			  {  0,116,117,118,119,120,121,122,123,  0}};
-		
+		NoteNumber = new int[][]{ {  0, 28, 29, 30, 31, 32, 33, 34, 35,  0},
+	                			  {108, 64, 65, 66, 67, 96, 97, 98, 99,100},
+	                			  {109, 60, 61, 62, 63, 92, 93, 94, 95,101},
+	                			  {110, 56, 57, 58, 59, 88, 89, 90, 91,102},
+	                			  {111, 52, 53, 54, 55, 84, 85, 86, 87,103},
+	                			  {112, 48, 49, 50, 51, 80, 81, 82, 83,104},
+	                			  {113, 44, 45, 46, 47, 76, 77, 78, 79,105},
+	                			  {114, 40, 41, 42, 43, 72, 73, 74, 75,106},
+	                			  {115, 36, 37, 38, 39, 68, 69, 70, 71,107},
+	                			  {  0,116,117,118,119,120,121,122,123,  0}};
+
+		//int[][] NoteNumber = rotateLeftPad.clone();
+		//int[][] NoteNumber = defaultPad.clone();
+	
 		int rectY = padPosition_y;
 		for(int i = 0;i < 10; i++)
 		{
@@ -70,6 +76,38 @@ public class Launchpad
 				rectX = rectX + particleWidth + SlotGapX;
 			}
 			rectY = rectY + particleHeight + SlotGapY;
+		}
+	}
+	
+	private void InitMidiRotate(int _rotateMode)
+	{
+		MidiMappingTable = new int[128];
+		switch(_rotateMode)
+		{
+			case 1: //left
+			{
+				for(int i = 0;i < 10; i++)
+				{
+					for(int j = 0;j < 10; j++)
+					{	
+						int _index = NoteNumber[i][j];
+						MidiMappingTable[_index] = NoteNumber[9-j][i];
+					}
+				}
+				break;
+			}
+			default: // No rotate
+			{
+				for(int i = 0;i < 10; i++)
+				{
+					for(int j = 0;j < 10; j++)
+					{	
+						int _index = NoteNumber[i][j];
+						MidiMappingTable[_index] = NoteNumber[i][j];
+					}
+				}
+				break;
+			}
 		}
 	}
 	
@@ -85,10 +123,16 @@ public class Launchpad
 		InitParticlePosition();
 	}
 	
+	public void updatePositionZ(int _valueZ)
+	{
+		padPosition_z = padPosition_z + _valueZ;
+		InitParticlePosition();
+	}
+	
 
 	public void updateVolicity(int Note,int Volicity)
 	{
-		int index = Note;
+		int index = MidiMappingTable[Note];
 		Particle P1 = MainMatrix.get(index); 
 		P1.SetVolicity(Volicity);
 	}
@@ -155,10 +199,11 @@ public class Launchpad
 		int _pointerY = 0;
 		int _pointerZ = 0;
 
-//		parent.fill(200, 200, 200);
-//		parent.textSize(20);
-//		String _Text = "Pad:"+PadName;
-//		parent.text(_Text, padPosition_x-5, padPosition_y-50); 
+		//text
+		parent.fill(200, 200, 200);
+		parent.textSize(20);
+		String _Text = "Pad:"+PadName+",x:"+Integer.toString(padPosition_x)+",y:"+Integer.toString(padPosition_y);
+		parent.text(_Text, padPosition_x-5, padPosition_y-50); 
 		
 		//parent.directionalLight(255, 255, 255, (float)0.5, (float)0.5, 0);
 		//parent.directionalLight(255, 255, 255, (float)-0.5, (float)-0.5, 0);
@@ -166,13 +211,15 @@ public class Launchpad
 //		parent.rotateX(PApplet.radians(angleX));
 //		parent.rotateY(PApplet.radians(angleY));
 //		parent.rotateZ(PApplet.radians(angleZ));
-		parent.stroke(200);
+		
+		//parent.stroke(200);
+	
 		for (int i = 1; i < MainMatrix.size(); i++)
 		{
 			Particle P1 = MainMatrix.get(i);
 			parent.translate(P1.coordinate_x - _pointerX, P1.coordinate_y - _pointerY, P1.coordinate_z - _pointerZ);
 			P1.display(4);
-			//P1.display(2);
+			//P1.display(3);
 			_pointerX = P1.coordinate_x;
 			_pointerY = P1.coordinate_y;
 			_pointerZ = P1.coordinate_z;

@@ -25,7 +25,9 @@ public class MatrixClassProject extends PApplet{
 	int _Note = 0;
 	int test_count = 0; //testing
 	
-	int _angleX = 45;
+	//2 pads        x:45 y:0 z:0 
+	//full screen 2 x:51 y:0 z:0 
+	int _angleX = 67;  
 	int _angleY = 0;
 	int _angleZ = 0;
 	public static void main(String[] args) {
@@ -36,7 +38,7 @@ public class MatrixClassProject extends PApplet{
 	{
 		//size(1600,800); 		// 2D
 		//fullScreen(1);
-		//fullScreen(2);
+		fullScreen(2);
 		size(1500,1000,P3D);	// 3D
 	}
 
@@ -44,7 +46,7 @@ public class MatrixClassProject extends PApplet{
 	{
 		surface.setResizable(true);
 		noStroke(); 				// no border line
-		frameRate(50);				// 30Hz  30fps
+		frameRate(60);				// 30Hz  30fps
 		
 		oscP5 = new OscP5(this,2346);
 		myRemoteLocation = new NetAddress("10.1.1.6",2346);
@@ -62,9 +64,12 @@ public class MatrixClassProject extends PApplet{
 		}
 		
 		MidiDevice = new ArrayList<Launchpad>(); 
-		MidiDevice.add(new Launchpad(this,"Launchpad Pro",570,500,0));
-		MidiDevice.add(new Launchpad(this,"Launchpad Mini",570,80,0));
-		//MidiDevice.add(new Launchpad(this,"Launchpad test",570,500,-100));
+		//MidiDevice.add(new Launchpad(this,"Launchpad Pro",570,500,0,1));//500
+		//MidiDevice.add(new Launchpad(this,"Launchpad Mini",570,80,0,1));//80
+		
+		//full screen 2,only pad2, and rotate pad to left
+		MidiDevice.add(new Launchpad(this,"Launchpad Pro",780,1300,00,1));
+		MidiDevice.add(new Launchpad(this,"Launchpad Mini",735,512,-293,1));
 			
 		myMatrixMessage = new OscMessage("/MatrixVelocity");
 		
@@ -85,9 +90,20 @@ public class MatrixClassProject extends PApplet{
 //		test_count++;  //testing
 		
 		background(0);
+		
+		//text angle info
+		fill(200, 200, 200);
+		textSize(20);
+		String _Text = "_angleX:"+Integer.toString(_angleX)+"_angleY"+Integer.toString(_angleY)+"_angleZ"+Integer.toString(_angleZ);
+		text(_Text, 100, 100); 
+		_Text = "x:"+Integer.toString(MidiDevice.get(1).padPosition_x)+",y:"+Integer.toString(MidiDevice.get(1).padPosition_y)+",z:"+Integer.toString(MidiDevice.get(1).padPosition_z);
+		text(_Text, 100, 150); 
+		
+		
 		rotateX(PApplet.radians(_angleX));
 		rotateY(PApplet.radians(_angleY));
 		rotateZ(PApplet.radians(_angleZ));
+
 		for (int i = 0; i < MidiDevice.size(); i++) 
 		{
 			//MidiDevice.get(i).display();	//2D
@@ -247,6 +263,23 @@ public class MatrixClassProject extends PApplet{
 				}
 				break;
 			}
+			case 'r':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionZ(1);
+				}
+				break;
+			}
+			case 'f':
+			{
+				for (int i = 0; i < MidiDevice.size(); i++) 
+				{
+					MidiDevice.get(i).updatePositionZ(-1);
+				}
+				break;
+			}
+			
 		}
 		
 	}

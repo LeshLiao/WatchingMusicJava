@@ -55,6 +55,7 @@ public class ControlPanel extends JFrame {
 	private JTextField textField_ipBegin;
 	private JTextField txtSudoChmodr;
 	private JLabel lblNewLabel_Total;
+	private JLabel lblNewLabel_LocalIP;
 	/**
 	 * Create the frame.
 	 */
@@ -116,7 +117,7 @@ public class ControlPanel extends JFrame {
 				}
 			}
 		});
-		btnNewButton.setBounds(34, 53, 135, 27);
+		btnNewButton.setBounds(34, 53, 153, 27);
 		panel.add(btnNewButton);
 		
 		JButton btnInitalAllDevice = new JButton("Inital All Device");
@@ -124,7 +125,7 @@ public class ControlPanel extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 			}
 		});
-		btnInitalAllDevice.setBounds(463, 93, 153, 27);
+		btnInitalAllDevice.setBounds(489, 93, 153, 27);
 		panel.add(btnInitalAllDevice);
 		
 		JButton btnStopAllService = new JButton("Stop all service");
@@ -146,7 +147,7 @@ public class ControlPanel extends JFrame {
 				System.out.println("Button Event: STOP_OSC");
 			}
 		});
-		btnStopAllService.setBounds(34, 93, 135, 27);
+		btnStopAllService.setBounds(34, 93, 153, 27);
 		panel.add(btnStopAllService);
 		
 		JButton btnRunAllService = new JButton("Run all service");
@@ -170,42 +171,46 @@ public class ControlPanel extends JFrame {
 				System.out.println("Button Event: RUN_OSC");
 			}
 		});
-		btnRunAllService.setBounds(195, 93, 125, 27);
+		btnRunAllService.setBounds(221, 93, 125, 27);
 		panel.add(btnRunAllService);
 		
 		textField_Subnet = new JTextField();
 		textField_Subnet.setText("192.168.1");
-		textField_Subnet.setBounds(196, 54, 116, 25);
+		textField_Subnet.setBounds(222, 54, 116, 25);
 		panel.add(textField_Subnet);
 		textField_Subnet.setColumns(10);
 		
 		textField_port = new JTextField();
 		textField_port.setText("2346");
-		textField_port.setBounds(332, 54, 60, 25);
+		textField_port.setBounds(358, 54, 60, 25);
 		panel.add(textField_port);
 		textField_port.setColumns(10);
 		
 		textField_ipRange = new JTextField();
 		textField_ipRange.setText("113");
-		textField_ipRange.setBounds(482, 54, 60, 25);
+		textField_ipRange.setBounds(508, 54, 60, 25);
 		panel.add(textField_ipRange);
 		textField_ipRange.setColumns(10);
 		
 		textField_timeout = new JTextField();
 		textField_timeout.setText("60");
-		textField_timeout.setBounds(556, 54, 60, 25);
+		textField_timeout.setBounds(582, 54, 60, 25);
 		panel.add(textField_timeout);
 		textField_timeout.setColumns(10);
 		
 		textField_ipBegin = new JTextField();
 		textField_ipBegin.setText("99");
 		textField_ipBegin.setColumns(10);
-		textField_ipBegin.setBounds(408, 54, 60, 25);
+		textField_ipBegin.setBounds(434, 54, 60, 25);
 		panel.add(textField_ipBegin);
 		
 		JButton btnTest_2 = new JButton("Clean device table");
-		btnTest_2.setBounds(34, 13, 135, 27);
+		btnTest_2.setBounds(34, 13, 153, 27);
 		panel.add(btnTest_2);
+		
+		
+		lblNewLabel_LocalIP.setBounds(221, 17, 223, 19);
+		panel.add(lblNewLabel_LocalIP);
 		btnTest_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Stable.ClearTable();
@@ -416,7 +421,9 @@ public class ControlPanel extends JFrame {
 		inetAddress = InetAddress.getLocalHost();
 		_myHostAddress = inetAddress.getHostAddress();	
 		_myHostport = 2349;
-	}
+		lblNewLabel_LocalIP = new JLabel("Local_IP");
+		lblNewLabel_LocalIP.setText("Host IP: "+_myHostAddress);
+	}	
 	
 	public void SendCommendToAllDevice(String _commend)
 	{

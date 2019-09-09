@@ -1,7 +1,7 @@
 {
-  "ProjectName": "Light Project - Model_006 20190903",
+  "ProjectName": "Light Project - Model_006 20190910",
   "FileVersion": "00.00.01",
-  "Timestamp": "1567147888",
+  "Timestamp": "1567140910",
   "MyStations": [
 	{
       "StationID": 0,
@@ -10,8 +10,8 @@
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
-		{"Type":"WS281X_Ch0","Config":["470","18","800000","10","0","64","0","0x00081000"]},
-		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","64","1","0x00081000"]}
+		{"Type":"WS281X_Ch0","Config":["470","18","800000","10","0","32","0","0x00081000"]},
+		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","32","1","0x00081000"]}
 	  ],
 	  "Rules": [
         {"Tag":0,"PadNo":0,"Input":64,"OutputType":"WS281X_Ch0","OutputParam":[0,30]},
@@ -44,12 +44,12 @@
 	{
       "StationID": 0,
       "Name": "Led Matrix pad - Column3&4&DMX",
-      "IP": "192.168.1.101",
+      "IP": "192.168.1.102",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
-		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","64","0","0x00081000"]},
-		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","64","1","0x00081000"]},
+		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","32","0","0x00081000"]},
+		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","32","1","0x00081000"]},
 		{"Type":"DMX","Config":["0","64","0"]},
 		{"Type":"EL","Config":["/dev/ttyUSB0","2","9"]}
 	  ],
@@ -70,20 +70,22 @@
         {"Tag":5,"PadNo":0,"Input":47,"OutputType":"WS281X_Ch1","OutputParam":[150,180]},
         {"Tag":6,"PadNo":0,"Input":43,"OutputType":"WS281X_Ch1","OutputParam":[180,210]},
         {"Tag":7,"PadNo":0,"Input":39,"OutputType":"WS281X_Ch1","OutputParam":[210,240]},
-		{"Tag":17,"PadNo":0,"Input":28,"OutputType":"DMX","OutputParam":[1,9,3,4,5,6]},
-        {"Tag":18,"PadNo":0,"Input":29,"OutputType":"DMX","OutputParam":[10,9,3,4,5,6]}
+		{"Tag":17,"PadNo":0,"Input":28,"OutputType":"DMX","OutputParam":[1,8,1,2,3,4]},
+        {"Tag":18,"PadNo":0,"Input":30,"OutputType":"DMX","OutputParam":[9,8,1,2,3,4]},
+		{"Tag":18,"PadNo":0,"Input":33,"OutputType":"DMX","OutputParam":[17,8,1,2,3,4]},
+		{"Tag":18,"PadNo":0,"Input":35,"OutputType":"DMX","OutputParam":[25,8,1,2,3,4]}
       ]
     }
 	,
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Column5&6",
-      "IP": "192.168.1.102",
+      "IP": "192.168.1.106",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
-		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","64","0","0x00081000"]},
-		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","64","1","0x00081000"]}
+		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","32","0","0x00081000"]},
+		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","32","1","0x00081000"]}
 	  ],
 	  "Rules": [
         {"Tag":0,"PadNo":0,"Input":96,"OutputType":"WS281X_Ch0","OutputParam":[0,30]},
@@ -108,12 +110,12 @@
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Column7&8&Right",
-      "IP": "192.168.1.138",
+      "IP": "192.168.1.107",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
-		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","64","0","0x00081000"]},
-		{"Type":"WS281X_Ch1","Config":["300","13","800000","10","0","64","1","0x00081000"]}
+		{"Type":"WS281X_Ch0","Config":["300","18","800000","10","0","32","0","0x00081000"]},
+		{"Type":"WS281X_Ch1","Config":["470","13","800000","10","0","32","1","0x00081000"]}
 	  ],
 	  "Rules": [
         {"Tag":0,"PadNo":0,"Input":98,"OutputType":"WS281X_Ch0","OutputParam":[0,30]},
@@ -146,11 +148,11 @@
     {
       "StationID": 0,
       "Name": "Led Matrix pad - Left&Top",
-      "IP": "192.168.1.106",
+      "IP": "192.168.1.108",
       "Port": 2346,
       "Titles":"Input:[Note,Tag],WS281X_Ch0 OutputParam:[Begin,End] Input:[Note,Tag],DMX OutputParam:[BeginChannel,MaxChannel,Dimmer,Red,Green,Blue]",
 	  "Devices":[
-		{"Type":"WS281X_Ch0","Config":["470","18","800000","10","0","64","0","0x00081000"]}
+		{"Type":"WS281X_Ch0","Config":["470","18","800000","10","0","32","0","0x00081000"]}
 	  ],
 	  "Rules": [
         {"Tag":0,"PadNo":0,"Input":35,"OutputType":"WS281X_Ch0","OutputParam":[5,22]},

@@ -26,9 +26,9 @@ public class StatusTable extends JTable{
         this.setModel(tmodel);
         
         this.getColumnModel().getColumn(0).setPreferredWidth(70);
-        this.getColumnModel().getColumn(1).setPreferredWidth(40);	
-        this.getColumnModel().getColumn(2).setPreferredWidth(60);
-        this.getColumnModel().getColumn(3).setPreferredWidth(80);
+        this.getColumnModel().getColumn(1).setPreferredWidth(30);	
+        this.getColumnModel().getColumn(2).setPreferredWidth(50);
+        this.getColumnModel().getColumn(3).setPreferredWidth(100);
         this.getColumnModel().getColumn(4).setPreferredWidth(60);
         this.getColumnModel().getColumn(5).setPreferredWidth(300);
         
